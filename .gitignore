@@ -1,7 +1,45 @@
+# Unreal Engine generated output (also applies inside source plugins).
 Binaries/
 Intermediate/
 DerivedDataCache/
 Saved/
+
+# Generated IDE projects and per-user settings.
 .vs/
+.idea/
 *.sln
+*.suo
+*.sdf
+*.opensdf
 *.VC.db
+*.VC.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.csproj
+*.csproj.user
+*.code-workspace
+
+# Local build/run diagnostics written beside the .uproject.
+# Keep curated logs, CSVs and screenshots under Evidence/ versioned.
+/*.log
+/*.uba
+/Build.json
+
+# Python helper caches and virtual environments.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS-generated metadata and editor backup files.
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*~
+
+# Intentionally tracked: Source/, Config/, Content/ (.uasset/.umap),
+# Tools/, Documentation/, Evidence/, the .uproject and launch scripts.
+# Do not ignore Build/: it may contain authored packaging resources.
