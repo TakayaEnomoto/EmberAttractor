@@ -1,0 +1,6 @@
+# Preserve authored assets and capture checksums across Windows clones.
+* -text
+*.uasset binary
+*.umap binary
+*.png binary
+*.pdf binary

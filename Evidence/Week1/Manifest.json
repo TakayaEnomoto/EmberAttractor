@@ -1,0 +1,209 @@
+{
+  "captures": [
+    {
+      "mode": 0,
+      "label": "Baseline",
+      "samples": 7868,
+      "mean_wall_ms": 2.542605122013218,
+      "p95_wall_ms": 3.3171,
+      "max_wall_ms": 440.7737,
+      "mean_wall_excluding_screenshot_window_ms": 2.4867878575969486,
+      "native_samples": 7866,
+      "native_frame_mean_ms": 2.487605466564963,
+      "whole_gpu_mean_ms": 1.5804142512077295,
+      "niagara_gpu_simulation_mean_ms": null,
+      "niagara_system_gt_plus_rt_mean_ms": 0.0,
+      "system_timings": {},
+      "evidence": [
+        {
+          "path": "Evidence/Week1/mode0.log",
+          "source": "Saved/Profiling/Ember_mode0_20261014_103826.log",
+          "sha256": "d575daa5965f469a6694a19621417edcfd54acef963c230f827f391a3ffdf1fd",
+          "bytes": 102649
+        },
+        {
+          "path": "Evidence/Week1/mode0_frames.csv",
+          "source": "Saved/Profiling/EmberLab_20261014_103902_mode0.csv",
+          "sha256": "0e592adbdece2df33687e2da7a36e5b0934acc666e707aea2566487d33608063",
+          "bytes": 484112
+        },
+        {
+          "path": "Evidence/Week1/mode0_engine.csv",
+          "source": "Saved/Profiling/CSV/Profile(20261014_103842).csv",
+          "sha256": "4ff4503a16a36d81f4e3821662498358a12ea122a0994b526c2f0830e6bb2c16",
+          "bytes": 14184025
+        },
+        {
+          "path": "Evidence/Week1/mode0_capture.png",
+          "source": "Saved/Profiling/EmberLab_20261014_103842_mode0.png",
+          "sha256": "3b39ff1d3cca60bd2d532e390e1c0ebbeb1f47717584a6a67c33d62afe690791",
+          "bytes": 2647227
+        }
+      ],
+      "trace": {
+        "path": "Saved/Profiling/Ember_mode0_20261014_103826.utrace",
+        "bytes": 338687651
+      }
+    },
+    {
+      "mode": 1,
+      "label": "GPU 100,000",
+      "samples": 6213,
+      "mean_wall_ms": 3.220033252856913,
+      "p95_wall_ms": 3.8207,
+      "max_wall_ms": 513.4929,
+      "mean_wall_excluding_screenshot_window_ms": 3.137766811594203,
+      "native_samples": 6211,
+      "native_frame_mean_ms": 3.138659942038319,
+      "whole_gpu_mean_ms": 2.311010771212365,
+      "niagara_gpu_simulation_mean_ms": 0.019569763323136372,
+      "niagara_system_gt_plus_rt_mean_ms": 0.10805023345677024,
+      "system_timings": {
+        "NS_Embers_GPU": {
+          "gt_aggregate_us": 77.98177427145387,
+          "rt_us": 30.068459185316375
+        }
+      },
+      "evidence": [
+        {
+          "path": "Evidence/Week1/mode1.log",
+          "source": "Saved/Profiling/Ember_mode1_20261014_104447.log",
+          "sha256": "d5e36752397b6e03f092d80aa9ff4b8a9b6929fce92d4d907220895d37b0c6b7",
+          "bytes": 103722
+        },
+        {
+          "path": "Evidence/Week1/mode1_frames.csv",
+          "source": "Saved/Profiling/EmberLab_20261014_104523_mode1.csv",
+          "sha256": "c423847a74b07d6043e9b219323a846bdbc11e62bd4d0f61dab0ce71f1677654",
+          "bytes": 382344
+        },
+        {
+          "path": "Evidence/Week1/mode1_engine.csv",
+          "source": "Saved/Profiling/CSV/Profile(20261014_104503).csv",
+          "sha256": "61643f87dc738e84d0b0419965419055279c3d17bc02c7d59f5455eae6d218da",
+          "bytes": 11987718
+        },
+        {
+          "path": "Evidence/Week1/mode1_capture.png",
+          "source": "Saved/Profiling/EmberLab_20261014_104503_mode1.png",
+          "sha256": "f659fdd3f28463b0b441c2baf8f22aa904522d20f0e45bc4704b825169e4a6eb",
+          "bytes": 2556474
+        }
+      ],
+      "trace": {
+        "path": "Saved/Profiling/Ember_mode1_20261014_104447.utrace",
+        "bytes": 320894750
+      }
+    },
+    {
+      "mode": 2,
+      "label": "CPU 500",
+      "samples": 5835,
+      "mean_wall_ms": 3.4283416281062555,
+      "p95_wall_ms": 4.2874,
+      "max_wall_ms": 527.8555,
+      "mean_wall_excluding_screenshot_window_ms": 3.3383744170096024,
+      "native_samples": 5833,
+      "native_frame_mean_ms": 3.3393765129435966,
+      "whole_gpu_mean_ms": 1.7275233670495458,
+      "niagara_gpu_simulation_mean_ms": null,
+      "niagara_system_gt_plus_rt_mean_ms": 0.4415524772844162,
+      "system_timings": {
+        "NS_Debris_CPU": {
+          "gt_aggregate_us": 386.3472655580319,
+          "rt_us": 55.20521172638436
+        }
+      },
+      "evidence": [
+        {
+          "path": "Evidence/Week1/mode2.log",
+          "source": "Saved/Profiling/Ember_mode2_20261014_104003.log",
+          "sha256": "b9385f2051d8f219febfd556a42288fb4690192f727c7e1f2a53d52eba4d9235",
+          "bytes": 103761
+        },
+        {
+          "path": "Evidence/Week1/mode2_frames.csv",
+          "source": "Saved/Profiling/EmberLab_20261014_104039_mode2.csv",
+          "sha256": "5bb91daa7c59e089277be95f5806dc56a24153a3862ac081f8968234c9b0c95e",
+          "bytes": 359009
+        },
+        {
+          "path": "Evidence/Week1/mode2_engine.csv",
+          "source": "Saved/Profiling/CSV/Profile(20261014_104020).csv",
+          "sha256": "8e5e6bda1dde28e61cb16c5b9110682e22c800e9ecc75d9941fe713639f2f1bb",
+          "bytes": 11033521
+        },
+        {
+          "path": "Evidence/Week1/mode2_capture.png",
+          "source": "Saved/Profiling/EmberLab_20261014_104019_mode2.png",
+          "sha256": "daaea013a4e3dae2da19e0bbc40fe25b46604c4d75f62f5f681384a54caca398",
+          "bytes": 2561987
+        }
+      ],
+      "trace": {
+        "path": "Saved/Profiling/Ember_mode2_20261014_104003.utrace",
+        "bytes": 342170669
+      }
+    },
+    {
+      "mode": 3,
+      "label": "Both: 100,000 + 500",
+      "samples": 5537,
+      "mean_wall_ms": 3.613077803864909,
+      "p95_wall_ms": 4.5186,
+      "max_wall_ms": 391.0589,
+      "mean_wall_excluding_screenshot_window_ms": 3.5430785869172388,
+      "native_samples": 5535,
+      "native_frame_mean_ms": 3.5441952664859984,
+      "whole_gpu_mean_ms": 2.401686630532972,
+      "niagara_gpu_simulation_mean_ms": 0.01987770551038844,
+      "niagara_system_gt_plus_rt_mean_ms": 0.5651956820234868,
+      "system_timings": {
+        "NS_Embers_GPU": {
+          "gt_aggregate_us": 85.47333333333333,
+          "rt_us": 35.510840108401084
+        },
+        "NS_Debris_CPU": {
+          "gt_aggregate_us": 388.64224028906955,
+          "rt_us": 55.56926829268293
+        }
+      },
+      "evidence": [
+        {
+          "path": "Evidence/Week1/mode3.log",
+          "source": "Saved/Profiling/Ember_mode3_20261014_104648.log",
+          "sha256": "6adbf66ca9bcf6b407b4bd4d97b5f269cb2647be67ef6b5fb4d9ebe1c9805336",
+          "bytes": 104279
+        },
+        {
+          "path": "Evidence/Week1/mode3_frames.csv",
+          "source": "Saved/Profiling/EmberLab_20261014_104723_mode3.csv",
+          "sha256": "cc282c90c4699fe605bc441852c02c7db65351aa5aa3108be85de36da2c057ec",
+          "bytes": 340691
+        },
+        {
+          "path": "Evidence/Week1/mode3_engine.csv",
+          "source": "Saved/Profiling/CSV/Profile(20261014_104704).csv",
+          "sha256": "76c88c599d5173b6337b2c1a8ab79ac370b1bec1130c31bf62cb894cd6771b6e",
+          "bytes": 10995559
+        },
+        {
+          "path": "Evidence/Week1/mode3_capture.png",
+          "source": "Saved/Profiling/EmberLab_20261014_104703_mode3.png",
+          "sha256": "98c813ff79a1e25236a9d307e3885eec4ecc1b429d0155bf53771a2980d14a38",
+          "bytes": 2547735
+        }
+      ],
+      "trace": {
+        "path": "Saved/Profiling/Ember_mode3_20261014_104648.utrace",
+        "bytes": 362017209
+      }
+    }
+  ],
+  "asset_sha256": {
+    "Content/EmberLab/L_EmberLab.umap": "2d7830179aa3a12ba8e5662813d3d5b947e9f16e99eeed258399560ab4baf613",
+    "Content/EmberLab/M_Debris.uasset": "e4b8381c0c2802baf0281436f8c26a37d09b3d80fd0d477f5ed6e242787bdc35",
+    "Content/EmberLab/NS_Debris_CPU.uasset": "abe6b1def696adb9c3cb77541bed0a687e11a3bbb15a60b53c3627dd9bee50a8",
+    "Content/EmberLab/NS_Embers_GPU.uasset": "5fbae6dd74ba046386cd2cf49c52680ef7d62b883b35a222470a61fb3e491557"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.7",
+  "Category": "Education",
+  "Description": "Niagara at Scale: an independent ember attraction laboratory.",
+  "Modules": [
+    { "Name": "EmberAttractor", "Type": "Runtime", "LoadingPhase": "Default" },
+    { "Name": "EmberAttractorEditor", "Type": "Editor", "LoadingPhase": "Default" }
+  ],
+  "Plugins": [
+    { "Name": "Niagara", "Enabled": true },
+    { "Name": "PythonScriptPlugin", "Enabled": true },
+    { "Name": "EditorScriptingUtilities", "Enabled": true }
+  ]
+}

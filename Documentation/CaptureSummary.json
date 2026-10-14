@@ -1,0 +1,58 @@
+[
+  {
+    "file": "EmberLab_20261014_103902_mode0.csv",
+    "mode": 0,
+    "gpu_target_count": 100000,
+    "cpu_target_count": 500,
+    "sample_count": 7868,
+    "mean_frame_ms": 2.5426,
+    "median_frame_ms": 2.4359,
+    "p95_frame_ms": 3.3171,
+    "max_frame_ms": 440.7737,
+    "whole_game_thread_mean_ms": 2.1672,
+    "whole_render_thread_mean_ms": 2.4423,
+    "note": "Includes screenshot-associated frames and hitches. Whole-frame timings are not Niagara timings."
+  },
+  {
+    "file": "EmberLab_20261014_104039_mode2.csv",
+    "mode": 2,
+    "gpu_target_count": 100000,
+    "cpu_target_count": 500,
+    "sample_count": 5835,
+    "mean_frame_ms": 3.4283,
+    "median_frame_ms": 3.1762,
+    "p95_frame_ms": 4.2874,
+    "max_frame_ms": 527.8555,
+    "whole_game_thread_mean_ms": 3.3655,
+    "whole_render_thread_mean_ms": 2.2613,
+    "note": "Includes screenshot-associated frames and hitches. Whole-frame timings are not Niagara timings."
+  },
+  {
+    "file": "EmberLab_20261014_104523_mode1.csv",
+    "mode": 1,
+    "gpu_target_count": 100000,
+    "cpu_target_count": 500,
+    "sample_count": 6213,
+    "mean_frame_ms": 3.22,
+    "median_frame_ms": 3.0913,
+    "p95_frame_ms": 3.8207,
+    "max_frame_ms": 513.4929,
+    "whole_game_thread_mean_ms": 2.9556,
+    "whole_render_thread_mean_ms": 3.0979,
+    "note": "Includes screenshot-associated frames and hitches. Whole-frame timings are not Niagara timings."
+  },
+  {
+    "file": "EmberLab_20261014_104723_mode3.csv",
+    "mode": 3,
+    "gpu_target_count": 100000,
+    "cpu_target_count": 500,
+    "sample_count": 5537,
+    "mean_frame_ms": 3.6131,
+    "median_frame_ms": 3.4298,
+    "p95_frame_ms": 4.5186,
+    "max_frame_ms": 391.0589,
+    "whole_game_thread_mean_ms": 3.5612,
+    "whole_render_thread_mean_ms": 2.7884,
+    "note": "Includes screenshot-associated frames and hitches. Whole-frame timings are not Niagara timings."
+  }
+]
