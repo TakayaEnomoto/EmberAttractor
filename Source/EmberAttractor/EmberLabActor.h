@@ -181,5 +181,6 @@ private:
 	int32 ConsumedGPU = 0;
 	int32 ConsumedCPU = 0;
 	int32 SaturatedReadbacks = 0;
+	float ConsumeFlash = 0.0f;
 	TArray<FString> CaptureRows;
 };

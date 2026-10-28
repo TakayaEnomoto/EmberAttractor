@@ -19,6 +19,7 @@
 #include "NiagaraEmitterHandle.h"
 #include "NiagaraGraph.h"
 #include "NiagaraMeshRendererProperties.h"
+#include "NiagaraNodeAssignment.h"
 #include "NiagaraNodeFunctionCall.h"
 #include "NiagaraNodeOutput.h"
 #include "ViewModels/Stack/NiagaraParameterHandle.h"
@@ -532,7 +533,15 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count, bool bDy
 			bGPU ? FLinearColor(1.0f, 0.18f, 0.015f, 0.72f) : FLinearColor(1.4f, 0.55f, 0.12f, 1.0f)) &&
 		AddUserParameter(System, TEXT("User.ColdColor"), FNiagaraTypeDefinition::GetColorDef(), 0, 0.0f,
 			bGPU ? FLinearColor(0.05f, 0.012f, 0.02f, 0.35f) : FLinearColor(0.08f, 0.1f, 0.14f, 1.0f)) &&
-		AddUserParameter(System, TEXT("User.ExportHandler"), FNiagaraTypeDefinition::GetUObjectDef());
+		AddUserParameter(System, TEXT("User.ExportHandler"), FNiagaraTypeDefinition::GetUObjectDef()) &&
+		AddUserParameter(System, TEXT("User.CaptureRadius"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.EscapeRadius"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.OrbitStrength"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.OrbitVortex"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.CapturedTint"), FNiagaraTypeDefinition::GetFloatDef(), 0, 1.0f) &&
+		AddUserParameter(System, TEXT("User.FreeTint"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.CapturedColor"), FNiagaraTypeDefinition::GetColorDef(), 0, 0.0f,
+			FLinearColor(0.35f, 1.1f, 1.8f, 1.0f));
 	if (!bParams)
 	{
 		return false;
@@ -637,6 +646,11 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count, bool bDy
 		? TEXT("(R=1.0,G=0.18,B=0.015,A=0.72)")
 		: TEXT("(R=0.12,G=0.6,B=1.4,A=1.0)");
 	FNiagaraStackGraphUtilities::AddParameterModuleToStack({Color}, *ParticleSpawn, INDEX_NONE, {ColorValue});
+	const FNiagaraVariable Captured(FNiagaraTypeDefinition::GetBoolDef(), TEXT("Particles.Captured"));
+	if (!bGPU)
+	{
+		FNiagaraStackGraphUtilities::AddParameterModuleToStack({Captured}, *ParticleSpawn, INDEX_NONE, {TEXT("false")});
+	}
 	UNiagaraScript* UpdateScript = Data->UpdateScriptProps.Script;
 	const FString EmitterName = Emitter->GetUniqueEmitterName();
 
@@ -687,12 +701,73 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count, bool bDy
 		return false;
 	}
 
-	UNiagaraNodeFunctionCall* Attractor = AddModule(TEXT("/Niagara/Modules/Update/Forces/V2/PointAttractionForce.PointAttractionForce"), ParticleUpdate, 4);
+	int32 NextModule = 4;
+	if (!bGPU)
+	{
+		// Debris state machine: Drifting -> Captured -> Swallowed (the export and kill above).
+		// Captured latches inside User.CaptureRadius and is released only beyond User.EscapeRadius:
+		//   Captured = (d < Capture) || (Captured && d < Escape)
+		UNiagaraNodeFunctionCall* State = FNiagaraStackGraphUtilities::AddParameterModuleToStack(
+			{Captured}, *ParticleUpdate, NextModule++, {TEXT("false")});
+		FString StateInput;
+		FNiagaraTypeDefinition StateType;
+		const TCHAR* StateInputName = FindModuleInput(State, TEXT("Particles.Captured"), StateInput, StateType)
+			? TEXT("Particles.Captured") : TEXT("Captured");
+		UNiagaraNodeFunctionCall* Latch = SetDynamicInput(State, StateInputName,
+			TEXT("/Niagara/DynamicInputs/Bool/Boolean_OrOperation.Boolean_OrOperation"));
+		UNiagaraNodeFunctionCall* Enter = Latch ? SetDynamicInput(Latch, TEXT("Bool1"),
+			TEXT("/Niagara/DynamicInputs/Bool/v2/SetBoolByFloatComparison.SetBoolByFloatComparison")) : nullptr;
+		UNiagaraNodeFunctionCall* Hold = Latch ? SetDynamicInput(Latch, TEXT("Bool2"),
+			TEXT("/Niagara/DynamicInputs/Bool/Boolean_AndOperation.Boolean_AndOperation")) : nullptr;
+		UNiagaraNodeFunctionCall* Within = Hold ? SetDynamicInput(Hold, TEXT("Bool2"),
+			TEXT("/Niagara/DynamicInputs/Bool/v2/SetBoolByFloatComparison.SetBoolByFloatComparison")) : nullptr;
+		UNiagaraNodeFunctionCall* EnterDistance = Enter ? SetDynamicInput(Enter, TEXT("A"),
+			TEXT("/Niagara/DynamicInputs/Vectors/Position/DistanceBetweenPositions.DistanceBetweenPositions")) : nullptr;
+		UNiagaraNodeFunctionCall* WithinDistance = Within ? SetDynamicInput(Within, TEXT("A"),
+			TEXT("/Niagara/DynamicInputs/Vectors/Position/DistanceBetweenPositions.DistanceBetweenPositions")) : nullptr;
+		const bool bStateLinked = EnterDistance && WithinDistance
+			&& SetStaticSwitch(Enter, TEXT("Comparison"), TEXT("Less"), TEXT("Equal"))
+			&& SetStaticSwitch(Within, TEXT("Comparison"), TEXT("Less"), TEXT("Equal"))
+			&& LinkInput(Enter, TEXT("B"), TEXT("User.CaptureRadius"))
+			&& LinkInput(Within, TEXT("B"), TEXT("User.EscapeRadius"))
+			&& LinkInput(Hold, TEXT("Bool1"), TEXT("Particles.Captured"))
+			&& LinkInput(EnterDistance, TEXT("A"), TEXT("Particles.Position"))
+			&& LinkInput(EnterDistance, TEXT("B"), TEXT("User.AttractorPosition"))
+			&& LinkInput(WithinDistance, TEXT("A"), TEXT("Particles.Position"))
+			&& LinkInput(WithinDistance, TEXT("B"), TEXT("User.AttractorPosition"));
+		if (!bStateLinked)
+		{
+			Error(TEXT("Failed to build debris state machine"));
+			return false;
+		}
+	}
+
+	// Captured debris keep orbiting inward without the player's energy-costing pull:
+	//   value = max(Free, Captured ? Bound : Free)
+	auto LinkCapturedOrFree = [&](UNiagaraNodeFunctionCall* Module, const TCHAR* InputName, const TCHAR* Free, const TCHAR* Bound)
+	{
+		if (bGPU)
+		{
+			return LinkInput(Module, InputName, Free);
+		}
+		UNiagaraNodeFunctionCall* Max = SetDynamicInput(Module, InputName,
+			TEXT("/Niagara/DynamicInputs/Math/Max_Float.Max_Float"));
+		UNiagaraNodeFunctionCall* Select = Max ? SetDynamicInput(Max, TEXT("B"),
+			TEXT("/Niagara/DynamicInputs/TypeConversions/MakeCustomFloatFromBool.MakeCustomFloatFromBool")) : nullptr;
+		return Select
+			&& LinkInput(Max, TEXT("A"), Free)
+			&& LinkInput(Select, TEXT("Bool"), TEXT("Particles.Captured"))
+			&& LinkInput(Select, TEXT("True Float"), Bound)
+			&& LinkInput(Select, TEXT("False Float"), Free);
+	};
+
+	UNiagaraNodeFunctionCall* Attractor = AddModule(TEXT("/Niagara/Modules/Update/Forces/V2/PointAttractionForce.PointAttractionForce"), ParticleUpdate, NextModule++);
 	SetFloatInput(Attractor, UpdateScript, EmitterName, TEXT("Kill Radius"), 0.0f);
 	// The pull is a spring (force grows with distance), so its reach is capped by gameplay.
 	const bool bRadiusLinked = LinkInput(Attractor, TEXT("Attraction Radius"), TEXT("User.PullRadius"));
 	const bool bPositionLinked = BindInput(Attractor, TEXT("Attractor Position"), FNiagaraTypeDefinition::GetPositionDef(), TEXT("User.AttractorPosition"));
-	const bool bStrengthLinked = BindInput(Attractor, TEXT("Attraction Strength"), FNiagaraTypeDefinition::GetFloatDef(), TEXT("User.AttractionStrength"));
+	const bool bStrengthLinked = LinkCapturedOrFree(Attractor, TEXT("Attraction Strength"),
+		TEXT("User.AttractionStrength"), TEXT("User.OrbitStrength"));
 	if (!bRadiusLinked || !bPositionLinked || !bStrengthLinked)
 	{
 		Error(TEXT("Failed to link attraction controls"));
@@ -700,9 +775,9 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count, bool bDy
 	}
 
 	// Accretion swirl: the third simple rule, driven by gameplay only while the player pulls.
-	UNiagaraNodeFunctionCall* Vortex = AddModule(TEXT("/Niagara/Modules/Update/Forces/VortexForce.VortexForce"), ParticleUpdate, 5);
+	UNiagaraNodeFunctionCall* Vortex = AddModule(TEXT("/Niagara/Modules/Update/Forces/VortexForce.VortexForce"), ParticleUpdate, NextModule++);
 	const bool bVortexLinked = LinkInput(Vortex, TEXT("Vortex Origin"), TEXT("User.AttractorPosition"))
-		&& LinkInput(Vortex, TEXT("Vortex Force Amount"), TEXT("User.VortexStrength"));
+		&& LinkCapturedOrFree(Vortex, TEXT("Vortex Force Amount"), TEXT("User.VortexStrength"), TEXT("User.OrbitVortex"));
 	if (!bVortexLinked)
 	{
 		Error(TEXT("Failed to link vortex controls"));
@@ -710,12 +785,33 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count, bool bDy
 	}
 	SetFloatInput(Vortex, UpdateScript, EmitterName, TEXT("Influence Falloff Radius"), 1200.0f);
 
-	UNiagaraNodeFunctionCall* Drag = AddModule(TEXT("/Niagara/Modules/Update/Forces/Drag.Drag"), ParticleUpdate, 6);
+	UNiagaraNodeFunctionCall* Drag = AddModule(TEXT("/Niagara/Modules/Update/Forces/Drag.Drag"), ParticleUpdate, NextModule++);
 	SetFloatInput(Drag, UpdateScript, EmitterName, TEXT("Drag"), 0.7f);
 
 	// Cooling: colour fades from hot to cold over User.CoolSeconds, matching the heat
-	// value gameplay derives from the exported age.
-	UNiagaraNodeFunctionCall* Fade = ColorModule ? SetDynamicInput(ColorModule, TEXT("Color"),
+	// value gameplay derives from the exported age. Captured debris glow User.CapturedColor.
+	UNiagaraNodeFunctionCall* FadeOwner = ColorModule;
+	const TCHAR* FadeInput = TEXT("Color");
+	if (!bGPU && ColorModule)
+	{
+		UNiagaraNodeFunctionCall* StateColor = SetDynamicInput(ColorModule, TEXT("Color"),
+			TEXT("/Niagara/DynamicInputs/LinearColor/LerpLinearColors.LerpLinearColors"));
+		UNiagaraNodeFunctionCall* Tint = StateColor ? SetDynamicInput(StateColor, TEXT("LerpFactor"),
+			TEXT("/Niagara/DynamicInputs/TypeConversions/MakeCustomFloatFromBool.MakeCustomFloatFromBool")) : nullptr;
+		const bool bTintLinked = Tint
+			&& LinkInput(StateColor, TEXT("EndColor"), TEXT("User.CapturedColor"))
+			&& LinkInput(Tint, TEXT("Bool"), TEXT("Particles.Captured"))
+			&& LinkInput(Tint, TEXT("True Float"), TEXT("User.CapturedTint"))
+			&& LinkInput(Tint, TEXT("False Float"), TEXT("User.FreeTint"));
+		if (!bTintLinked)
+		{
+			Error(TEXT("Failed to build captured colour"));
+			return false;
+		}
+		FadeOwner = StateColor;
+		FadeInput = TEXT("StartColor");
+	}
+	UNiagaraNodeFunctionCall* Fade = FadeOwner ? SetDynamicInput(FadeOwner, FadeInput,
 		TEXT("/Niagara/DynamicInputs/LinearColor/LerpLinearColors.LerpLinearColors")) : nullptr;
 	UNiagaraNodeFunctionCall* Clamp = Fade ? SetDynamicInput(Fade, TEXT("LerpFactor"),
 		TEXT("/Niagara/DynamicInputs/Clamp/ClampFloat.ClampFloat")) : nullptr;

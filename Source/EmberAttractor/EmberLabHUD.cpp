@@ -36,12 +36,13 @@ void AEmberLabHUD::DrawHUD()
 	const float PanelX = 30.0f;
 	const float PanelY = 30.0f;
 	const float PanelWidth = 400.0f;
-	const float PanelHeight = Lab->IsGameEnabled() ? 455.0f : 333.0f;
+	const float PanelHeight = Lab->IsGameEnabled() ? 479.0f : 333.0f;
 	const FLinearColor PanelColor(0.014f, 0.019f, 0.029f, 0.87f);
 	const FLinearColor Primary(1.0f, 0.88f, 0.72f, 1.0f);
 	const FLinearColor Secondary(0.71f, 0.76f, 0.82f, 1.0f);
 	const FLinearColor Accent(1.0f, 0.29f, 0.08f, 1.0f);
 	const FLinearColor EnergyColor(0.35f, 0.75f, 1.0f, 1.0f);
+	const FLinearColor CapturedColor(0.45f, 0.95f, 1.0f, 1.0f);
 	DrawRect(PanelColor, PanelX, PanelY, PanelWidth, PanelHeight);
 	DrawRect(Accent, PanelX, PanelY, 5.0f, PanelHeight);
 
@@ -81,6 +82,8 @@ void AEmberLabHUD::DrawHUD()
 			*FString::FormatAsNumber(Lab->GetConsumedGPU()), *FString::FormatAsNumber(Lab->GetConsumedCPU()),
 			Lab->GetSaturatedReadbacks() > 0 ? *FString::Printf(TEXT("  /  %d full readbacks"), Lab->GetSaturatedReadbacks()) : TEXT("")),
 			Secondary, 49.0f, Y, Font, 0.95f);
+		Y += 24.0f;
+		DrawText(TEXT("Debris      orange drifting  /  cyan captured"), CapturedColor, 49.0f, Y, Font, 0.95f);
 		Y += 28.0f;
 	}
 

@@ -7,18 +7,18 @@
     "dynamic_bounds": true,
     "gpu_port": false,
     "samples": 299,
-    "wall_mean_ms": 33.75963478260869,
-    "wall_p95_ms": 38.6886,
-    "frame_mean_ms": 33.76244833333333,
-    "game_thread_ms": 34.24057233333333,
-    "render_thread_ms": 15.053544333333333,
-    "gpu_frame_ms": 2.0488846666666665,
+    "wall_mean_ms": 32.783079933110365,
+    "wall_p95_ms": 36.5192,
+    "frame_mean_ms": 32.79458566666667,
+    "game_thread_ms": 33.276915333333335,
+    "render_thread_ms": 16.277080666666667,
+    "gpu_frame_ms": 2.0715786666666665,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 10.526044019999999,
+    "niagara_gt_rt_ms": 9.924948330333333,
     "systems": {
       "NS_Debris_CPU_DynamicBounds": {
-        "gt_aggregate_ms": 10.280865019999998,
-        "rt_ms": 0.245179,
+        "gt_aggregate_ms": 9.699028663666667,
+        "rt_ms": 0.22591966666666669,
         "mean_live_count": 0.9966666666666667
       }
     },
@@ -26,15 +26,15 @@
     "evidence": [
       {
         "path": "Evidence/Final/bounds_dynamic_20000.log",
-        "sha256": "86fa731404f5ba9ad5e47fbcd870df396d35d78a19536fbcd3566677b69050c4"
+        "sha256": "60387352a17c6378f307e5a44cc088f1aa18d22b9c6f3aab79e61e00a67d26a2"
       },
       {
         "path": "Evidence/Final/bounds_dynamic_20000.frames.csv",
-        "sha256": "df05059a0b1a69121e2946a1b272bea0c4848ba687d227b7398cf8ee660264fd"
+        "sha256": "21f438fdb0a824fa2430c30e9ba100709b739d909659391874a1473753dd4e3c"
       },
       {
         "path": "Evidence/Final/bounds_dynamic_20000.engine.csv.gz",
-        "sha256": "190bb3e3b1b8c058bbd134a8ba1eed20127ea258276d2866e2d4448864a6a58d"
+        "sha256": "5c19e82beadbd79f4aceb5cf68ce0c17f94a41ddda39321d220deeb98e7cbc55"
       }
     ]
   },
@@ -45,35 +45,35 @@
     "cpu_count": 5000,
     "dynamic_bounds": true,
     "gpu_port": false,
-    "samples": 1027,
-    "wall_mean_ms": 9.192033008763389,
-    "wall_p95_ms": 10.9033,
-    "frame_mean_ms": 9.196318482490272,
-    "game_thread_ms": 9.37106887159533,
-    "render_thread_ms": 4.608113813229572,
-    "gpu_frame_ms": 1.7786609922178989,
+    "samples": 1119,
+    "wall_mean_ms": 8.410100089365505,
+    "wall_p95_ms": 9.7612,
+    "frame_mean_ms": 8.415666517857144,
+    "game_thread_ms": 8.596955714285714,
+    "render_thread_ms": 4.263151071428571,
+    "gpu_frame_ms": 1.801531517857143,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 2.836804866828794,
+    "niagara_gt_rt_ms": 2.665277766875,
     "systems": {
       "NS_Debris_CPU_DynamicBounds": {
-        "gt_aggregate_ms": 2.739674613910506,
-        "rt_ms": 0.09713025291828793,
-        "mean_live_count": 0.9990272373540856
+        "gt_aggregate_ms": 2.5671823204464284,
+        "rt_ms": 0.09809544642857143,
+        "mean_live_count": 0.9991071428571429
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/bounds_dynamic_5000.log",
-        "sha256": "291b7f40d1d3db56575fefb24967950f592efa025b5a5a41ee0e692187680ce7"
+        "sha256": "129ab10fd2da8b852a27902cc723c439fdf14cf13f68c5ee29648cc6652876e7"
       },
       {
         "path": "Evidence/Final/bounds_dynamic_5000.frames.csv",
-        "sha256": "8abf8c182118426ead18b3a3ed2bf9cc991a5a491371422218a09ac4383b9fad"
+        "sha256": "09d845de62e278097fc1994419552dc89a10b4efe8ae2e8532e618ec4121c216"
       },
       {
         "path": "Evidence/Final/bounds_dynamic_5000.engine.csv.gz",
-        "sha256": "f5d2a1c563bf7da2d54215c033bec2b24bd941ce730fe2dec3584feab3687b43"
+        "sha256": "92db787751d98a8f7e6b7a93973ecadff58951a15acc9aca5562d4fbc16923c1"
       }
     ]
   },
@@ -84,35 +84,35 @@
     "cpu_count": 10000,
     "dynamic_bounds": false,
     "gpu_port": true,
-    "samples": 2985,
-    "wall_mean_ms": 3.1804565159128977,
-    "wall_p95_ms": 4.1127,
-    "frame_mean_ms": 3.1820419290020094,
-    "game_thread_ms": 3.0741927662424646,
-    "render_thread_ms": 3.1160885800401874,
-    "gpu_frame_ms": 1.8455321165438714,
-    "niagara_gpu_sim_ms": 0.033474112525117214,
-    "niagara_gt_rt_ms": 0.1330680843938379,
+    "samples": 2836,
+    "wall_mean_ms": 3.341275916784203,
+    "wall_p95_ms": 4.1228,
+    "frame_mean_ms": 3.3430302432146632,
+    "game_thread_ms": 2.9735692280578077,
+    "render_thread_ms": 3.3302719774409586,
+    "gpu_frame_ms": 1.8537467042650688,
+    "niagara_gpu_sim_ms": 0.03277708847373986,
+    "niagara_gt_rt_ms": 0.12494913641170251,
     "systems": {
       "NS_Debris_GPUPort": {
-        "gt_aggregate_ms": 0.09152307434695243,
-        "rt_ms": 0.04154501004688547,
-        "mean_live_count": 0.9996651038178165
+        "gt_aggregate_ms": 0.08512470919985901,
+        "rt_ms": 0.0398244272118435,
+        "mean_live_count": 0.9996475149806133
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/port_gpu_10000.log",
-        "sha256": "39142cae15bd7bbb23a05f129b18c10eb125ccbc43eb14e2372f81b32213e77b"
+        "sha256": "f52b4f4e9825f506268e9efc7bf6c344cab62a9ba371736822162baec0a03142"
       },
       {
         "path": "Evidence/Final/port_gpu_10000.frames.csv",
-        "sha256": "c12f9c1b86b5c8220161fd1459d2c9cac9dcdc294bd674a3acb3bf8f939e5d78"
+        "sha256": "59a4b38e3c4a2bcd51ca28f872fef92ea19b674f6ae01fbba74fc7db789308d8"
       },
       {
         "path": "Evidence/Final/port_gpu_10000.engine.csv.gz",
-        "sha256": "9d7e6b38a7490e95bc135abe947a91e4176ed92ad13a57626e7884aab40f92c9"
+        "sha256": "0887318f26fd38d224102d5d80dd0322f7d1b0380ea9216b3292917c2c48b820"
       }
     ]
   },
@@ -123,35 +123,35 @@
     "cpu_count": 1000,
     "dynamic_bounds": false,
     "gpu_port": true,
-    "samples": 3086,
-    "wall_mean_ms": 3.0829851263771872,
-    "wall_p95_ms": 3.9467,
-    "frame_mean_ms": 3.084472335600907,
-    "game_thread_ms": 2.9910698088759315,
-    "render_thread_ms": 3.031900647878199,
-    "gpu_frame_ms": 1.734209394233884,
-    "niagara_gpu_sim_ms": 0.03226025267249757,
-    "niagara_gt_rt_ms": 0.13075276967930027,
+    "samples": 2857,
+    "wall_mean_ms": 3.319657577878894,
+    "wall_p95_ms": 4.0366,
+    "frame_mean_ms": 3.3215156053184045,
+    "game_thread_ms": 3.019948880335899,
+    "render_thread_ms": 3.311249755073478,
+    "gpu_frame_ms": 1.7503917074877537,
+    "niagara_gpu_sim_ms": 0.03190951714485654,
+    "niagara_gt_rt_ms": 0.1255273268019594,
     "systems": {
       "NS_Debris_GPUPort": {
-        "gt_aggregate_ms": 0.0898379980563654,
-        "rt_ms": 0.04091477162293489,
-        "mean_live_count": 0.9996760609005507
+        "gt_aggregate_ms": 0.08509328201539539,
+        "rt_ms": 0.04043404478656403,
+        "mean_live_count": 0.9996501049685095
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/port_gpu_1000.log",
-        "sha256": "ca9899ed9e3cea97e82e0bd3414dff862e486a90cbe712f3198dd1b719b58679"
+        "sha256": "1c3f432ac61eeb4cf43665d94fac6f4ee091b83d9aa17e2c39a44d32a0d4e02d"
       },
       {
         "path": "Evidence/Final/port_gpu_1000.frames.csv",
-        "sha256": "2ac9e322f7177fad06ba85238576bd7519f5f41fc3a4de42132bd9196e98ac89"
+        "sha256": "d9cf92d87a48d0d676946740cedc6c764500b7a4b419c24adaca94d7349f3eaf"
       },
       {
         "path": "Evidence/Final/port_gpu_1000.engine.csv.gz",
-        "sha256": "534b0170083b43b5a7546f813b23c359bafe4bbec013746e363e91e92ceecf60"
+        "sha256": "703522c61da3698355737378af357ce533cb2f3b83212f8a561bc0062ab126aa"
       }
     ]
   },
@@ -162,35 +162,35 @@
     "cpu_count": 20000,
     "dynamic_bounds": false,
     "gpu_port": true,
-    "samples": 2479,
-    "wall_mean_ms": 3.7918794675272287,
-    "wall_p95_ms": 4.9992,
-    "frame_mean_ms": 3.794430927419355,
-    "game_thread_ms": 3.465148790322581,
-    "render_thread_ms": 3.744708629032258,
-    "gpu_frame_ms": 2.0159413306451612,
-    "niagara_gpu_sim_ms": 0.03640266129032258,
-    "niagara_gt_rt_ms": 0.14909004032258064,
+    "samples": 2829,
+    "wall_mean_ms": 3.3506159420289854,
+    "wall_p95_ms": 4.095,
+    "frame_mean_ms": 3.3520195053003534,
+    "game_thread_ms": 2.970058692579505,
+    "render_thread_ms": 3.338986925795053,
+    "gpu_frame_ms": 2.0004931448763252,
+    "niagara_gpu_sim_ms": 0.03749233215547703,
+    "niagara_gt_rt_ms": 0.1260697879858657,
     "systems": {
       "NS_Debris_GPUPort": {
-        "gt_aggregate_ms": 0.10073415322580645,
-        "rt_ms": 0.0483558870967742,
-        "mean_live_count": 0.9995967741935484
+        "gt_aggregate_ms": 0.08531886925795053,
+        "rt_ms": 0.04075091872791519,
+        "mean_live_count": 0.9996466431095407
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/port_gpu_20000.log",
-        "sha256": "6f95ea5e862973c25c0a38c7e7dd7decd6da268a55fc1fad5fb5c08b16525580"
+        "sha256": "b0da515eb7a22298329647fcd6928b21c49da2447bea864385430e0bf2c24ace"
       },
       {
         "path": "Evidence/Final/port_gpu_20000.frames.csv",
-        "sha256": "786da409023cbbd55c4045e71166eb5c0c9ba6e03096f8628dff35d20a8cd4f1"
+        "sha256": "beb942760e59ff544129903f0ba0e8ceae4d4d4b18719be3b61399f37bfd4bf2"
       },
       {
         "path": "Evidence/Final/port_gpu_20000.engine.csv.gz",
-        "sha256": "4c19b603c2796da012963b062003e3e28382778c303af7dc99619ee05c19243e"
+        "sha256": "ca6d171d1370ca28ecb7c1b45ee61e652fdae6603fc80d779bcd92015b06bf29"
       }
     ]
   },
@@ -201,35 +201,35 @@
     "cpu_count": 5000,
     "dynamic_bounds": false,
     "gpu_port": true,
-    "samples": 3103,
-    "wall_mean_ms": 3.0733846922333226,
-    "wall_p95_ms": 3.9224,
-    "frame_mean_ms": 3.0747782860824744,
-    "game_thread_ms": 2.971049838917526,
-    "render_thread_ms": 3.026884826030928,
-    "gpu_frame_ms": 1.77392293814433,
-    "niagara_gpu_sim_ms": 0.03197077963917526,
-    "niagara_gt_rt_ms": 0.12921340206185566,
+    "samples": 2784,
+    "wall_mean_ms": 3.3971391163793103,
+    "wall_p95_ms": 4.0931,
+    "frame_mean_ms": 3.39867407540395,
+    "game_thread_ms": 3.0733097307001795,
+    "render_thread_ms": 3.3852785996409334,
+    "gpu_frame_ms": 1.795361867145422,
+    "niagara_gpu_sim_ms": 0.03200585278276481,
+    "niagara_gt_rt_ms": 0.12808488330341114,
     "systems": {
       "NS_Debris_GPUPort": {
-        "gt_aggregate_ms": 0.08940260953608248,
-        "rt_ms": 0.03981079252577319,
-        "mean_live_count": 0.9996778350515464
+        "gt_aggregate_ms": 0.08710912028725315,
+        "rt_ms": 0.04097576301615799,
+        "mean_live_count": 0.999640933572711
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/port_gpu_5000.log",
-        "sha256": "d69c9c19f8d8bb49b87b3414b283f2feaae64c17040f49d1c418fcbbd1605103"
+        "sha256": "3ab587185b04e4d37aba53e763ecb2b8787f34e2ac2e39693c16e993a60e49a7"
       },
       {
         "path": "Evidence/Final/port_gpu_5000.frames.csv",
-        "sha256": "acca04fc438db7b5d486f3cba2bb9a55abd363b6246bca7b978cb11224d82c71"
+        "sha256": "432851fd435896afad8e7611fc167062062f3206971cc5db7d5fe1f634817866"
       },
       {
         "path": "Evidence/Final/port_gpu_5000.engine.csv.gz",
-        "sha256": "5fbe61c03ef30fd7e889b7cac7f61d5d8a4007e08c450e015e81722aac7f7aae"
+        "sha256": "1302228a1cc229cb0331f5c2c28b44f5e6dfeb187f500b220b887473f3782f4d"
       }
     ]
   },
@@ -240,13 +240,13 @@
     "cpu_count": 500,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 3922,
-    "wall_mean_ms": 2.4268706272310046,
-    "wall_p95_ms": 3.2732,
-    "frame_mean_ms": 2.4282628345653836,
-    "game_thread_ms": 2.1964756563854193,
-    "render_thread_ms": 2.398540606678562,
-    "gpu_frame_ms": 1.5593518990568442,
+    "samples": 3775,
+    "wall_mean_ms": 2.502827894039735,
+    "wall_p95_ms": 3.1848,
+    "frame_mean_ms": 2.504090995762712,
+    "game_thread_ms": 2.1078560116525424,
+    "render_thread_ms": 2.4957858315677965,
+    "gpu_frame_ms": 1.5891143273305084,
     "niagara_gpu_sim_ms": null,
     "niagara_gt_rt_ms": 0.0,
     "systems": {},
@@ -254,15 +254,15 @@
     "evidence": [
       {
         "path": "Evidence/Final/sweep_baseline.log",
-        "sha256": "5e528f8117e89e83dd3344709df179cd48ccb439ed77554307788ab47fb6fe23"
+        "sha256": "d08ce9879eb4a30f18f9e1229022757bc8df27d52dc0b9c85b4c7f2e13ee537f"
       },
       {
         "path": "Evidence/Final/sweep_baseline.frames.csv",
-        "sha256": "c2f2d5cfe4a7b5d9ff3b30f21a9e2e45524797c8bf4cfce8f5b4110354b83692"
+        "sha256": "e0367ee0711aea4782732787d66d3f64563d68a8ec76d49be53cb413bf2c6a70"
       },
       {
         "path": "Evidence/Final/sweep_baseline.engine.csv.gz",
-        "sha256": "c561fa968aa43b91661c05c910d22bddd0fe910866149ebd14b1701f98aa8df7"
+        "sha256": "bafc2919395e108830558a272bda7dabe95dd0bbaddd700e7871a26c42642675"
       }
     ]
   },
@@ -273,35 +273,35 @@
     "cpu_count": 10000,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 573,
-    "wall_mean_ms": 16.500613961605584,
-    "wall_p95_ms": 20.3683,
-    "frame_mean_ms": 16.509012543554007,
-    "game_thread_ms": 16.807705052264808,
-    "render_thread_ms": 7.206414285714286,
-    "gpu_frame_ms": 1.902955400696864,
+    "samples": 555,
+    "wall_mean_ms": 17.06477243243243,
+    "wall_p95_ms": 19.5567,
+    "frame_mean_ms": 17.069443884892085,
+    "game_thread_ms": 17.319738669064748,
+    "render_thread_ms": 9.2008,
+    "gpu_frame_ms": 1.9206881294964029,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 5.26535611010453,
+    "niagara_gt_rt_ms": 5.27517734208633,
     "systems": {
       "NS_Debris_CPU": {
-        "gt_aggregate_ms": 5.129507329616724,
-        "rt_ms": 0.13584878048780488,
-        "mean_live_count": 0.9982578397212544
+        "gt_aggregate_ms": 5.12766043561151,
+        "rt_ms": 0.14751690647482013,
+        "mean_live_count": 0.9982014388489209
       }
     },
     "within_budget": false,
     "evidence": [
       {
         "path": "Evidence/Final/sweep_cpu_10000.log",
-        "sha256": "1790c48101da6366bdf2d2c7b64050f30df9acb05364e486f135707cce4d2666"
+        "sha256": "b8aa757e65e3fc940b030193a3e760f8de163c220042610fe57f3d39296e509e"
       },
       {
         "path": "Evidence/Final/sweep_cpu_10000.frames.csv",
-        "sha256": "08b3dbfcb7cde3a59b7acc9a33d73dd450a2c90aad1f2184ecd78be97cb9d34d"
+        "sha256": "010e1d4da2b0cf6f39c5c60fb331f74078cc197f981fbc5559f08fe1b67627b7"
       },
       {
         "path": "Evidence/Final/sweep_cpu_10000.engine.csv.gz",
-        "sha256": "1f57d4cd5ad7ee58d6290e4e2040e317a2a0af418a4df3a9c953b5b32cdecfd8"
+        "sha256": "4153c6f3eac6992bdd372c6a797cb549281379637c658adfd2b98acbd451baaa"
       }
     ]
   },
@@ -312,35 +312,35 @@
     "cpu_count": 1000,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 2264,
-    "wall_mean_ms": 4.169948454063604,
-    "wall_p95_ms": 5.0373,
-    "frame_mean_ms": 4.17204587196468,
-    "game_thread_ms": 4.255905209713024,
-    "render_thread_ms": 2.417930507726269,
-    "gpu_frame_ms": 1.7268218101545254,
+    "samples": 2544,
+    "wall_mean_ms": 3.7218244889937107,
+    "wall_p95_ms": 4.1,
+    "frame_mean_ms": 3.723759960707269,
+    "game_thread_ms": 3.7890590962671906,
+    "render_thread_ms": 2.246741571709234,
+    "gpu_frame_ms": 1.7263184282907662,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 0.7436894922295806,
+    "niagara_gt_rt_ms": 0.6154683693516699,
     "systems": {
       "NS_Debris_CPU": {
-        "gt_aggregate_ms": 0.6812238410154525,
-        "rt_ms": 0.06246565121412804,
-        "mean_live_count": 0.9995584988962473
+        "gt_aggregate_ms": 0.5566690766208252,
+        "rt_ms": 0.05879929273084479,
+        "mean_live_count": 0.999607072691552
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/sweep_cpu_1000.log",
-        "sha256": "dc59fed6cf42f832937a6bf4793298af663a5f2127b3fb2d4e6b8b5de676faa5"
+        "sha256": "1eabf39e8c17f31ba3113892ccff9610e91a7e4154d38880247098289a906fe9"
       },
       {
         "path": "Evidence/Final/sweep_cpu_1000.frames.csv",
-        "sha256": "3002ca488798c54f913c027596413c6ad9da6bd4878a2b6a7d95f7d21a1d1c09"
+        "sha256": "d42edeb2b5678e429f37f92275742dd98c41d05523c429f47c66b672435297ee"
       },
       {
         "path": "Evidence/Final/sweep_cpu_1000.engine.csv.gz",
-        "sha256": "4014b95c85975978c60a7089d07782e63913dd8a1f080e0027e25c17ff7e4928"
+        "sha256": "07f0e143d9deb2e4b6ea2c40e055122d0f5e20c650320f325ede3f990736408b"
       }
     ]
   },
@@ -351,35 +351,35 @@
     "cpu_count": 20000,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 301,
-    "wall_mean_ms": 31.565925581395348,
-    "wall_p95_ms": 38.0954,
-    "frame_mean_ms": 31.52711523178808,
-    "game_thread_ms": 32.081392052980135,
-    "render_thread_ms": 12.613798013245033,
-    "gpu_frame_ms": 2.085022847682119,
+    "samples": 299,
+    "wall_mean_ms": 37.98369364548495,
+    "wall_p95_ms": 40.2595,
+    "frame_mean_ms": 37.941699,
+    "game_thread_ms": 38.456913666666665,
+    "render_thread_ms": 21.472694666666666,
+    "gpu_frame_ms": 2.1024806666666667,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 10.22545099602649,
+    "niagara_gt_rt_ms": 9.967925308333333,
     "systems": {
       "NS_Debris_CPU": {
-        "gt_aggregate_ms": 10.008765896688741,
-        "rt_ms": 0.21668509933774835,
-        "mean_live_count": 0.9966887417218543
+        "gt_aggregate_ms": 9.745374975,
+        "rt_ms": 0.22255033333333332,
+        "mean_live_count": 0.9966666666666667
       }
     },
     "within_budget": false,
     "evidence": [
       {
         "path": "Evidence/Final/sweep_cpu_20000.log",
-        "sha256": "370c9414701f444a2d9966b8039794275a04823c748facf6bd8db66bb2913659"
+        "sha256": "20e777e3f48d24f4a6878f5f6e1579fd3a180b7e0a3291ac25ab4ea3af025ab2"
       },
       {
         "path": "Evidence/Final/sweep_cpu_20000.frames.csv",
-        "sha256": "8339f08320ddd02d6bb9de2d22799f881a03409a5c9c5a6b55e820f83732651d"
+        "sha256": "4a95db06ff4194f68b4eb8870bbcfa9c72436e2348ff7e0a76c51ba18a49aa70"
       },
       {
         "path": "Evidence/Final/sweep_cpu_20000.engine.csv.gz",
-        "sha256": "a531ce07879f2db32c452b6679d3f7d6d831520ce414d452924d61c4893e89b6"
+        "sha256": "90b5d452ebc00fe37ce621b5ed64c00f8a84023c879240cc5dbd296b0c82e600"
       }
     ]
   },
@@ -390,35 +390,35 @@
     "cpu_count": 2000,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 1710,
-    "wall_mean_ms": 5.503038011695907,
-    "wall_p95_ms": 6.5371,
-    "frame_mean_ms": 5.506471595558153,
-    "game_thread_ms": 5.619936060783168,
-    "render_thread_ms": 3.0662398597311515,
-    "gpu_frame_ms": 1.7534510812390416,
+    "samples": 2016,
+    "wall_mean_ms": 4.707034623015873,
+    "wall_p95_ms": 5.1763,
+    "frame_mean_ms": 4.71021690629648,
+    "game_thread_ms": 4.79680436291522,
+    "render_thread_ms": 2.4500177491323747,
+    "gpu_frame_ms": 1.756610213187903,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 1.3395260666277031,
+    "niagara_gt_rt_ms": 1.0856900347050074,
     "systems": {
       "NS_Debris_CPU": {
-        "gt_aggregate_ms": 1.2638718293395674,
-        "rt_ms": 0.07565423728813558,
-        "mean_live_count": 0.9994155464640561
+        "gt_aggregate_ms": 1.0168214179474466,
+        "rt_ms": 0.06886861675756073,
+        "mean_live_count": 0.9995042141794744
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/sweep_cpu_2000.log",
-        "sha256": "bd7fb9a526c80f7cfcec03f52002ff6c2805037b0065d9bc30e73a705d9a2a65"
+        "sha256": "530802c4eb2b537d955706c3586f04d0e508d93b9a93d8dc94468e0c5ad2b451"
       },
       {
         "path": "Evidence/Final/sweep_cpu_2000.frames.csv",
-        "sha256": "40085e54d4d89303fa250294134dfec23ecdd9bf902a88e1100d76fc14137a11"
+        "sha256": "8bd3a8730a1f1578f21e9f66927d4b1d695c5e25463dded2a8df938e16b6fece"
       },
       {
         "path": "Evidence/Final/sweep_cpu_2000.engine.csv.gz",
-        "sha256": "29ed3d1596d801976b26f30d0c289bd5f4bcee82df27f4a7df93d77c3fa76783"
+        "sha256": "32c0321520ab598e3958cbb3ff7726a3138827796e098830e13e966899434cc7"
       }
     ]
   },
@@ -429,35 +429,35 @@
     "cpu_count": 5000,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 1098,
-    "wall_mean_ms": 8.673084244080146,
-    "wall_p95_ms": 9.9062,
-    "frame_mean_ms": 8.678225204731573,
-    "game_thread_ms": 8.829838034576888,
-    "render_thread_ms": 3.6445049135577796,
-    "gpu_frame_ms": 1.7735136487716106,
+    "samples": 1225,
+    "wall_mean_ms": 7.720082857142857,
+    "wall_p95_ms": 8.9122,
+    "frame_mean_ms": 7.725211500815661,
+    "game_thread_ms": 7.855913050570963,
+    "render_thread_ms": 3.727636704730832,
+    "gpu_frame_ms": 1.8004206362153343,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 2.8465921719745224,
+    "niagara_gt_rt_ms": 2.5292679433115826,
     "systems": {
       "NS_Debris_CPU": {
-        "gt_aggregate_ms": 2.7534588689717925,
-        "rt_ms": 0.09313330300272976,
-        "mean_live_count": 0.9990900818926297
+        "gt_aggregate_ms": 2.436726099918434,
+        "rt_ms": 0.09254184339314846,
+        "mean_live_count": 0.9991843393148451
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/sweep_cpu_5000.log",
-        "sha256": "e1b0081e6bba4f45d7e744ed246d17148e5ad190aa2c3b0c241aee34b5c9cbe6"
+        "sha256": "bb16956c361bbbb9343156e276bf7b8b3065a52567c14ec25aaab30a6c3d4ce6"
       },
       {
         "path": "Evidence/Final/sweep_cpu_5000.frames.csv",
-        "sha256": "fedceed9907f13ff4ef97f00c163c93cf2aa5f425dc5a4cd9947c0ec306c411d"
+        "sha256": "70bdfdd60db2acae8cfc6a646a85d378582df80b542fa35224ff30caf9036c33"
       },
       {
         "path": "Evidence/Final/sweep_cpu_5000.engine.csv.gz",
-        "sha256": "4d91b79d915751e554e7a91f5c71d9dfc4b069a12b8848931fb7c55f2075f012"
+        "sha256": "bd17249958db0d3b7bef4efccccaa82c6cd094e5e2b06e4359927e35fc27afa6"
       }
     ]
   },
@@ -468,35 +468,35 @@
     "cpu_count": 500,
     "dynamic_bounds": false,
     "gpu_port": false,
-    "samples": 2784,
-    "wall_mean_ms": 3.3911733836206897,
-    "wall_p95_ms": 4.2126,
-    "frame_mean_ms": 3.3929270377019747,
-    "game_thread_ms": 3.456269551166966,
-    "render_thread_ms": 2.326091885098743,
-    "gpu_frame_ms": 1.7022464272890485,
+    "samples": 2902,
+    "wall_mean_ms": 3.289220606478291,
+    "wall_p95_ms": 3.7164,
+    "frame_mean_ms": 3.2906909059593525,
+    "game_thread_ms": 3.3470272132276957,
+    "render_thread_ms": 2.2272888391319325,
+    "gpu_frame_ms": 1.7189166379607304,
     "niagara_gpu_sim_ms": null,
-    "niagara_gt_rt_ms": 0.4599989587432675,
+    "niagara_gt_rt_ms": 0.401183947640372,
     "systems": {
       "NS_Debris_CPU": {
-        "gt_aggregate_ms": 0.4048494793895871,
-        "rt_ms": 0.05514947935368043,
-        "mean_live_count": 0.999640933572711
+        "gt_aggregate_ms": 0.34783313813296585,
+        "rt_ms": 0.05335080950740613,
+        "mean_live_count": 0.9996555287633483
       }
     },
     "within_budget": true,
     "evidence": [
       {
         "path": "Evidence/Final/sweep_cpu_500.log",
-        "sha256": "a3814618b5a9dac7fe7ced15b247b752478db7c13ed2d9f08887da3f97ef1a68"
+        "sha256": "eaadef00bc11e7f117d82c7bef195ca9fd59e1ffb95e83ddf3132464e722fc73"
       },
       {
         "path": "Evidence/Final/sweep_cpu_500.frames.csv",
-        "sha256": "a3b07978363acd7a02c990acf573b69825e12b9dfeb4ffb88371a3b8eabff38f"
+        "sha256": "68faa051418b69b53c9b681df779be62726e7ad0de01d34be74e235ab9ffbd45"
       },
       {
         "path": "Evidence/Final/sweep_cpu_500.engine.csv.gz",
-        "sha256": "fdf3e987e80fc2bc3d78110e2c33007febbddfddd722208f31e4e34bca57f3e0"
+        "sha256": "c1054ef178200b2e2da70d314a5fb11434e232bdd148cfaefcf5d03db0ffad20"
       }
     ]
   },
@@ -535,7 +535,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_1000000.engine.csv.gz",
-        "sha256": "77d17215bd6d6cccfd23c29499e2eea0247e9a93ccda5e0321f6008fe0d33645"
+        "sha256": "b33b335a3000dbacf110a569daae8c0345ee174ea087726d3397bcd0a62fe656"
       }
     ]
   },
@@ -574,7 +574,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_100000.engine.csv.gz",
-        "sha256": "7487c99876fec0f1bdfd0fab4aa3151d4d7b945d7bb110e085c345544b137137"
+        "sha256": "586348fcc1d9fb7820556e50f72f0b824a9dcaa13ff9570c470cf22b1c4de7d4"
       }
     ]
   },
@@ -613,7 +613,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_2000000.engine.csv.gz",
-        "sha256": "526a35625fbabefd38698dacc19f6ce97daa545e5fd3fb52bf14bdd78c8bfbc9"
+        "sha256": "170fb026755a03b6e7130248b967e3180d51f856031b3d145183873accfca803"
       }
     ]
   },
@@ -652,7 +652,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_250000.engine.csv.gz",
-        "sha256": "6b5b9f669ae50aa001221cf937a5a2c4fe761a09f1df7ed7a33afe9a1a4e921a"
+        "sha256": "707d8641d26273f8dcab71ef9a6d5d29cb3e8b8f7d157877054b3cb551945469"
       }
     ]
   },
@@ -691,7 +691,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_4000000.engine.csv.gz",
-        "sha256": "234216274e1dd2f601fe9e08b8b9974927f134bdac3ef1fd6224c004adba7af9"
+        "sha256": "a592e2638245d2da81f42c48c1e2c3b69baa910dec02dc39dd02ee9b12b71e39"
       }
     ]
   },
@@ -730,7 +730,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_500000.engine.csv.gz",
-        "sha256": "ecaa9f62e03a2c5d46c1d648483730c0074fc51d61974a8ffb8011b9d0639e07"
+        "sha256": "5e1a802bd10e832f7cf96f58894d9248466897d6fa59511a6e8bf3d0c4416dc9"
       }
     ]
   },
@@ -769,7 +769,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_6000000.engine.csv.gz",
-        "sha256": "e8547671c5ef7a9123e5c116ad5f0c6aa9bf0b9d3819d3f3834600ad1bd9e469"
+        "sha256": "c9a6e68f5c62c3a13f435ece74be9278a9fcc85efe78065eaad95fbdd89bdd44"
       }
     ]
   },
@@ -808,7 +808,7 @@
       },
       {
         "path": "Evidence/Final/sweep_gpu_8000000.engine.csv.gz",
-        "sha256": "d30745a4809ec3db079788e0538d41e96c3421d889289de17f51f4eb3f3b8558"
+        "sha256": "bc8daaa5e86aacea83fceadae7f721e050bd10c583142822e7085972fd4d86a7"
       }
     ]
   }

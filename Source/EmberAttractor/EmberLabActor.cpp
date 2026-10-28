@@ -60,6 +60,13 @@ namespace
 	constexpr float PullRadiusPerHorizon = 2.0f;
 	constexpr float LabPullRadius = 4000.0f;
 	constexpr float VortexAcceleration = 120.0f;
+	constexpr float CaptureRadiusPerHorizon = 3.0f;
+	constexpr float MinCaptureRadius = 140.0f;
+	constexpr float EscapeRadiusPerCapture = 1.6f;
+	constexpr float OrbitPerPull = 0.8f;
+	constexpr float ConsumeFlashPerDebris = 0.05f;
+	constexpr float ConsumeFlashDecayPerSecond = 2.5f;
+	constexpr float ConsumeFlashIntensity = 40000.0f;
 	constexpr int32 GPUExportReservation = 16384;
 	constexpr double RepeatIntervalSeconds = 8.0;
 	constexpr int32 GPUCountPresets[] = {10000, 25000, 50000, 100000, 200000};
@@ -285,8 +292,15 @@ void AEmberLabActor::Tick(float DeltaSeconds)
 	const float Enabled = bAttractionActive ? 1.0f : 0.0f;
 	const float MassScale = 1.0f + Mass / MassForDoublePull;
 	const float Strength = AttractionStrength * MassScale * Enabled;
+	// Debris state machine radii. In the lab sandbox they are zero: the state is still
+	// evaluated (so its cost is measured) but nothing is ever captured.
+	const float CaptureRadius = bGameEnabled ? FMath::Max(HorizonRadius * CaptureRadiusPerHorizon, MinCaptureRadius) : 0.0f;
 	for (UNiagaraComponent* Component : {GPUComponent.Get(), CPUComponent.Get()})
 	{
+		Component->SetVariableFloat(TEXT("User.CaptureRadius"), CaptureRadius);
+		Component->SetVariableFloat(TEXT("User.EscapeRadius"), CaptureRadius * EscapeRadiusPerCapture);
+		Component->SetVariableFloat(TEXT("User.OrbitStrength"), AttractionStrength * MassScale * OrbitPerPull);
+		Component->SetVariableFloat(TEXT("User.OrbitVortex"), VortexAcceleration * MassScale * OrbitPerPull);
 		Component->SetVariablePosition(TEXT("User.AttractorPosition"), AttractorPosition);
 		Component->SetVariableFloat(TEXT("User.AttractionEnabled"), Enabled);
 		Component->SetVariableFloat(TEXT("User.AttractionStrength"), Strength);
@@ -299,7 +313,8 @@ void AEmberLabActor::Tick(float DeltaSeconds)
 	const float MarkerRadius = FMath::Max(HorizonRadius, 18.0f);
 	AttractorMarker->SetRelativeScale3D(FVector(MarkerRadius / 50.0f));
 	AttractorLight->SetVisibility(bAttractionActive || bGameEnabled);
-	AttractorLight->SetIntensity(bAttractionActive ? 20000.0f : 4000.0f);
+	ConsumeFlash = FMath::Max(0.0f, ConsumeFlash - DeltaSeconds * ConsumeFlashDecayPerSecond);
+	AttractorLight->SetIntensity((bAttractionActive ? 20000.0f : 4000.0f) + ConsumeFlash * ConsumeFlashIntensity);
 	AttractorLight->SetAttenuationRadius(500.0f + 4.0f * HorizonRadius);
 
 	if (bAutoRepeat && !bGameEnabled && Now - LastRepeatSeconds >= RepeatIntervalSeconds)
@@ -653,6 +668,7 @@ void AEmberLabActor::ReceiveParticleData_Implementation(const TArray<FBasicParti
 	else
 	{
 		ConsumedCPU += Data.Num();
+		ConsumeFlash = FMath::Min(1.0f, ConsumeFlash + Data.Num() * ConsumeFlashPerDebris);
 	}
 	if (!bGameEnabled || RoundState != EEmberRoundState::Playing)
 	{
