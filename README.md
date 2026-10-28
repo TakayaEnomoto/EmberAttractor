@@ -17,6 +17,7 @@ The direction comes from the gravity effects in our *Gravity* project (explosion
 | One optimization measured before/after | Report: fixed vs dynamic bounds, CPU-to-GPU port |
 | Runtime count control | `ember.GPUCount`, `ember.CPUCount`, `[` / `]` |
 | Proposal | [Documentation/Proposal.pdf](Documentation/Proposal.pdf) |
+| Reference games (played/watched, borrowed mechanic) | [Documentation/ReferenceNotes.md](Documentation/ReferenceNotes.md) |
 
 ## The game
 
@@ -30,7 +31,7 @@ The direction comes from the gravity effects in our *Gravity* project (explosion
 
 The tension is the energy budget against the clock: pulling gathers matter faster but runs dry, while waiting lets the matter cool. All released matter is worth 100 mass when hot (60 GPU dust + 40 CPU debris in mode 3), spread over the particle count, so a round plays the same at every count preset.
 
-Reference games: **PixelJunk Shooter** (simulated material as the puzzle) and **Noita** (hot material whose state matters).
+Reference games: **Noita**, the reference the mechanic borrows from (forces moving loose simulated material), and **PixelJunk Shooter** (material state read through colour; heat as the resource). Observations are in [Documentation/ReferenceNotes.md](Documentation/ReferenceNotes.md).
 
 ## Controls
 

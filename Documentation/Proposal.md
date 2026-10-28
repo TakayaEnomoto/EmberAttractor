@@ -17,7 +17,7 @@ An explosion scatters hot embers and debris across a chamber. The mouse moves a 
 Budget stated before building: 1080p at 60 fps (16.6 ms per frame), with combined Niagara game- and render-thread cost at or below 4 ms; GPU time is recorded separately. Sweep each system across at least five counts until the budget fails (GPU 100k→8M, CPU 500→20k), with `stat Niagara`, `stat GPU`, the Niagara Debugger, engine CSVs and Unreal Insights. The optimization will be measured before and after on identical workloads: fixed vs dynamic bounds, and a CPU-to-GPU port of the debris.
 
 ## References and milestones
-**Primary reference: PixelJunk Shooter**, where simulated material is the puzzle and the player manipulates it indirectly. **Secondary: Noita**, for hot material whose state changes what it is worth. Personal play/watch notes will be added after reviewing both games.
+**Primary reference: Noita** (played): loose, simulated material moved by forces rather than by a controlled character, and a few cells of the right material deciding the outcome. **Secondary: PixelJunk Shooter** (watched, about an hour of the first two episodes): water, lava and gas interactions as the puzzle, state changes read through colour, steam and sound, and the ship's heat gauge as the central resource. Full observations: [Documentation/ReferenceNotes.md](https://github.com/TakayaEnomoto/EmberAttractor/blob/main/Documentation/ReferenceNotes.md).
 
 **Week 1:** both systems in a test map, runtime count control, first capture (done). **Week 2:** black-hole round with energy and cooling, verified two-way readback, full scaling sweep. **Week 3:** measured optimization, two-page report, 60–90 second video, tagged release.
 
