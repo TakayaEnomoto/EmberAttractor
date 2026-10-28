@@ -1,0 +1,815 @@
+[
+  {
+    "label": "bounds_dynamic_20000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 20000,
+    "dynamic_bounds": true,
+    "gpu_port": false,
+    "samples": 299,
+    "wall_mean_ms": 33.75963478260869,
+    "wall_p95_ms": 38.6886,
+    "frame_mean_ms": 33.76244833333333,
+    "game_thread_ms": 34.24057233333333,
+    "render_thread_ms": 15.053544333333333,
+    "gpu_frame_ms": 2.0488846666666665,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 10.526044019999999,
+    "systems": {
+      "NS_Debris_CPU_DynamicBounds": {
+        "gt_aggregate_ms": 10.280865019999998,
+        "rt_ms": 0.245179,
+        "mean_live_count": 0.9966666666666667
+      }
+    },
+    "within_budget": false,
+    "evidence": [
+      {
+        "path": "Evidence/Final/bounds_dynamic_20000.log",
+        "sha256": "86fa731404f5ba9ad5e47fbcd870df396d35d78a19536fbcd3566677b69050c4"
+      },
+      {
+        "path": "Evidence/Final/bounds_dynamic_20000.frames.csv",
+        "sha256": "df05059a0b1a69121e2946a1b272bea0c4848ba687d227b7398cf8ee660264fd"
+      },
+      {
+        "path": "Evidence/Final/bounds_dynamic_20000.engine.csv.gz",
+        "sha256": "190bb3e3b1b8c058bbd134a8ba1eed20127ea258276d2866e2d4448864a6a58d"
+      }
+    ]
+  },
+  {
+    "label": "bounds_dynamic_5000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 5000,
+    "dynamic_bounds": true,
+    "gpu_port": false,
+    "samples": 1027,
+    "wall_mean_ms": 9.192033008763389,
+    "wall_p95_ms": 10.9033,
+    "frame_mean_ms": 9.196318482490272,
+    "game_thread_ms": 9.37106887159533,
+    "render_thread_ms": 4.608113813229572,
+    "gpu_frame_ms": 1.7786609922178989,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 2.836804866828794,
+    "systems": {
+      "NS_Debris_CPU_DynamicBounds": {
+        "gt_aggregate_ms": 2.739674613910506,
+        "rt_ms": 0.09713025291828793,
+        "mean_live_count": 0.9990272373540856
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/bounds_dynamic_5000.log",
+        "sha256": "291b7f40d1d3db56575fefb24967950f592efa025b5a5a41ee0e692187680ce7"
+      },
+      {
+        "path": "Evidence/Final/bounds_dynamic_5000.frames.csv",
+        "sha256": "8abf8c182118426ead18b3a3ed2bf9cc991a5a491371422218a09ac4383b9fad"
+      },
+      {
+        "path": "Evidence/Final/bounds_dynamic_5000.engine.csv.gz",
+        "sha256": "f5d2a1c563bf7da2d54215c033bec2b24bd941ce730fe2dec3584feab3687b43"
+      }
+    ]
+  },
+  {
+    "label": "port_gpu_10000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 10000,
+    "dynamic_bounds": false,
+    "gpu_port": true,
+    "samples": 2985,
+    "wall_mean_ms": 3.1804565159128977,
+    "wall_p95_ms": 4.1127,
+    "frame_mean_ms": 3.1820419290020094,
+    "game_thread_ms": 3.0741927662424646,
+    "render_thread_ms": 3.1160885800401874,
+    "gpu_frame_ms": 1.8455321165438714,
+    "niagara_gpu_sim_ms": 0.033474112525117214,
+    "niagara_gt_rt_ms": 0.1330680843938379,
+    "systems": {
+      "NS_Debris_GPUPort": {
+        "gt_aggregate_ms": 0.09152307434695243,
+        "rt_ms": 0.04154501004688547,
+        "mean_live_count": 0.9996651038178165
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/port_gpu_10000.log",
+        "sha256": "39142cae15bd7bbb23a05f129b18c10eb125ccbc43eb14e2372f81b32213e77b"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_10000.frames.csv",
+        "sha256": "c12f9c1b86b5c8220161fd1459d2c9cac9dcdc294bd674a3acb3bf8f939e5d78"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_10000.engine.csv.gz",
+        "sha256": "9d7e6b38a7490e95bc135abe947a91e4176ed92ad13a57626e7884aab40f92c9"
+      }
+    ]
+  },
+  {
+    "label": "port_gpu_1000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 1000,
+    "dynamic_bounds": false,
+    "gpu_port": true,
+    "samples": 3086,
+    "wall_mean_ms": 3.0829851263771872,
+    "wall_p95_ms": 3.9467,
+    "frame_mean_ms": 3.084472335600907,
+    "game_thread_ms": 2.9910698088759315,
+    "render_thread_ms": 3.031900647878199,
+    "gpu_frame_ms": 1.734209394233884,
+    "niagara_gpu_sim_ms": 0.03226025267249757,
+    "niagara_gt_rt_ms": 0.13075276967930027,
+    "systems": {
+      "NS_Debris_GPUPort": {
+        "gt_aggregate_ms": 0.0898379980563654,
+        "rt_ms": 0.04091477162293489,
+        "mean_live_count": 0.9996760609005507
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/port_gpu_1000.log",
+        "sha256": "ca9899ed9e3cea97e82e0bd3414dff862e486a90cbe712f3198dd1b719b58679"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_1000.frames.csv",
+        "sha256": "2ac9e322f7177fad06ba85238576bd7519f5f41fc3a4de42132bd9196e98ac89"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_1000.engine.csv.gz",
+        "sha256": "534b0170083b43b5a7546f813b23c359bafe4bbec013746e363e91e92ceecf60"
+      }
+    ]
+  },
+  {
+    "label": "port_gpu_20000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 20000,
+    "dynamic_bounds": false,
+    "gpu_port": true,
+    "samples": 2479,
+    "wall_mean_ms": 3.7918794675272287,
+    "wall_p95_ms": 4.9992,
+    "frame_mean_ms": 3.794430927419355,
+    "game_thread_ms": 3.465148790322581,
+    "render_thread_ms": 3.744708629032258,
+    "gpu_frame_ms": 2.0159413306451612,
+    "niagara_gpu_sim_ms": 0.03640266129032258,
+    "niagara_gt_rt_ms": 0.14909004032258064,
+    "systems": {
+      "NS_Debris_GPUPort": {
+        "gt_aggregate_ms": 0.10073415322580645,
+        "rt_ms": 0.0483558870967742,
+        "mean_live_count": 0.9995967741935484
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/port_gpu_20000.log",
+        "sha256": "6f95ea5e862973c25c0a38c7e7dd7decd6da268a55fc1fad5fb5c08b16525580"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_20000.frames.csv",
+        "sha256": "786da409023cbbd55c4045e71166eb5c0c9ba6e03096f8628dff35d20a8cd4f1"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_20000.engine.csv.gz",
+        "sha256": "4c19b603c2796da012963b062003e3e28382778c303af7dc99619ee05c19243e"
+      }
+    ]
+  },
+  {
+    "label": "port_gpu_5000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 5000,
+    "dynamic_bounds": false,
+    "gpu_port": true,
+    "samples": 3103,
+    "wall_mean_ms": 3.0733846922333226,
+    "wall_p95_ms": 3.9224,
+    "frame_mean_ms": 3.0747782860824744,
+    "game_thread_ms": 2.971049838917526,
+    "render_thread_ms": 3.026884826030928,
+    "gpu_frame_ms": 1.77392293814433,
+    "niagara_gpu_sim_ms": 0.03197077963917526,
+    "niagara_gt_rt_ms": 0.12921340206185566,
+    "systems": {
+      "NS_Debris_GPUPort": {
+        "gt_aggregate_ms": 0.08940260953608248,
+        "rt_ms": 0.03981079252577319,
+        "mean_live_count": 0.9996778350515464
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/port_gpu_5000.log",
+        "sha256": "d69c9c19f8d8bb49b87b3414b283f2feaae64c17040f49d1c418fcbbd1605103"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_5000.frames.csv",
+        "sha256": "acca04fc438db7b5d486f3cba2bb9a55abd363b6246bca7b978cb11224d82c71"
+      },
+      {
+        "path": "Evidence/Final/port_gpu_5000.engine.csv.gz",
+        "sha256": "5fbe61c03ef30fd7e889b7cac7f61d5d8a4007e08c450e015e81722aac7f7aae"
+      }
+    ]
+  },
+  {
+    "label": "sweep_baseline",
+    "mode": 0,
+    "gpu_count": 100000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 3922,
+    "wall_mean_ms": 2.4268706272310046,
+    "wall_p95_ms": 3.2732,
+    "frame_mean_ms": 2.4282628345653836,
+    "game_thread_ms": 2.1964756563854193,
+    "render_thread_ms": 2.398540606678562,
+    "gpu_frame_ms": 1.5593518990568442,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 0.0,
+    "systems": {},
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_baseline.log",
+        "sha256": "5e528f8117e89e83dd3344709df179cd48ccb439ed77554307788ab47fb6fe23"
+      },
+      {
+        "path": "Evidence/Final/sweep_baseline.frames.csv",
+        "sha256": "c2f2d5cfe4a7b5d9ff3b30f21a9e2e45524797c8bf4cfce8f5b4110354b83692"
+      },
+      {
+        "path": "Evidence/Final/sweep_baseline.engine.csv.gz",
+        "sha256": "c561fa968aa43b91661c05c910d22bddd0fe910866149ebd14b1701f98aa8df7"
+      }
+    ]
+  },
+  {
+    "label": "sweep_cpu_10000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 10000,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 573,
+    "wall_mean_ms": 16.500613961605584,
+    "wall_p95_ms": 20.3683,
+    "frame_mean_ms": 16.509012543554007,
+    "game_thread_ms": 16.807705052264808,
+    "render_thread_ms": 7.206414285714286,
+    "gpu_frame_ms": 1.902955400696864,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 5.26535611010453,
+    "systems": {
+      "NS_Debris_CPU": {
+        "gt_aggregate_ms": 5.129507329616724,
+        "rt_ms": 0.13584878048780488,
+        "mean_live_count": 0.9982578397212544
+      }
+    },
+    "within_budget": false,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_cpu_10000.log",
+        "sha256": "1790c48101da6366bdf2d2c7b64050f30df9acb05364e486f135707cce4d2666"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_10000.frames.csv",
+        "sha256": "08b3dbfcb7cde3a59b7acc9a33d73dd450a2c90aad1f2184ecd78be97cb9d34d"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_10000.engine.csv.gz",
+        "sha256": "1f57d4cd5ad7ee58d6290e4e2040e317a2a0af418a4df3a9c953b5b32cdecfd8"
+      }
+    ]
+  },
+  {
+    "label": "sweep_cpu_1000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 1000,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 2264,
+    "wall_mean_ms": 4.169948454063604,
+    "wall_p95_ms": 5.0373,
+    "frame_mean_ms": 4.17204587196468,
+    "game_thread_ms": 4.255905209713024,
+    "render_thread_ms": 2.417930507726269,
+    "gpu_frame_ms": 1.7268218101545254,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 0.7436894922295806,
+    "systems": {
+      "NS_Debris_CPU": {
+        "gt_aggregate_ms": 0.6812238410154525,
+        "rt_ms": 0.06246565121412804,
+        "mean_live_count": 0.9995584988962473
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_cpu_1000.log",
+        "sha256": "dc59fed6cf42f832937a6bf4793298af663a5f2127b3fb2d4e6b8b5de676faa5"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_1000.frames.csv",
+        "sha256": "3002ca488798c54f913c027596413c6ad9da6bd4878a2b6a7d95f7d21a1d1c09"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_1000.engine.csv.gz",
+        "sha256": "4014b95c85975978c60a7089d07782e63913dd8a1f080e0027e25c17ff7e4928"
+      }
+    ]
+  },
+  {
+    "label": "sweep_cpu_20000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 20000,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 301,
+    "wall_mean_ms": 31.565925581395348,
+    "wall_p95_ms": 38.0954,
+    "frame_mean_ms": 31.52711523178808,
+    "game_thread_ms": 32.081392052980135,
+    "render_thread_ms": 12.613798013245033,
+    "gpu_frame_ms": 2.085022847682119,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 10.22545099602649,
+    "systems": {
+      "NS_Debris_CPU": {
+        "gt_aggregate_ms": 10.008765896688741,
+        "rt_ms": 0.21668509933774835,
+        "mean_live_count": 0.9966887417218543
+      }
+    },
+    "within_budget": false,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_cpu_20000.log",
+        "sha256": "370c9414701f444a2d9966b8039794275a04823c748facf6bd8db66bb2913659"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_20000.frames.csv",
+        "sha256": "8339f08320ddd02d6bb9de2d22799f881a03409a5c9c5a6b55e820f83732651d"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_20000.engine.csv.gz",
+        "sha256": "a531ce07879f2db32c452b6679d3f7d6d831520ce414d452924d61c4893e89b6"
+      }
+    ]
+  },
+  {
+    "label": "sweep_cpu_2000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 2000,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 1710,
+    "wall_mean_ms": 5.503038011695907,
+    "wall_p95_ms": 6.5371,
+    "frame_mean_ms": 5.506471595558153,
+    "game_thread_ms": 5.619936060783168,
+    "render_thread_ms": 3.0662398597311515,
+    "gpu_frame_ms": 1.7534510812390416,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 1.3395260666277031,
+    "systems": {
+      "NS_Debris_CPU": {
+        "gt_aggregate_ms": 1.2638718293395674,
+        "rt_ms": 0.07565423728813558,
+        "mean_live_count": 0.9994155464640561
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_cpu_2000.log",
+        "sha256": "bd7fb9a526c80f7cfcec03f52002ff6c2805037b0065d9bc30e73a705d9a2a65"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_2000.frames.csv",
+        "sha256": "40085e54d4d89303fa250294134dfec23ecdd9bf902a88e1100d76fc14137a11"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_2000.engine.csv.gz",
+        "sha256": "29ed3d1596d801976b26f30d0c289bd5f4bcee82df27f4a7df93d77c3fa76783"
+      }
+    ]
+  },
+  {
+    "label": "sweep_cpu_5000",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 5000,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 1098,
+    "wall_mean_ms": 8.673084244080146,
+    "wall_p95_ms": 9.9062,
+    "frame_mean_ms": 8.678225204731573,
+    "game_thread_ms": 8.829838034576888,
+    "render_thread_ms": 3.6445049135577796,
+    "gpu_frame_ms": 1.7735136487716106,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 2.8465921719745224,
+    "systems": {
+      "NS_Debris_CPU": {
+        "gt_aggregate_ms": 2.7534588689717925,
+        "rt_ms": 0.09313330300272976,
+        "mean_live_count": 0.9990900818926297
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_cpu_5000.log",
+        "sha256": "e1b0081e6bba4f45d7e744ed246d17148e5ad190aa2c3b0c241aee34b5c9cbe6"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_5000.frames.csv",
+        "sha256": "fedceed9907f13ff4ef97f00c163c93cf2aa5f425dc5a4cd9947c0ec306c411d"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_5000.engine.csv.gz",
+        "sha256": "4d91b79d915751e554e7a91f5c71d9dfc4b069a12b8848931fb7c55f2075f012"
+      }
+    ]
+  },
+  {
+    "label": "sweep_cpu_500",
+    "mode": 2,
+    "gpu_count": 100000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 2784,
+    "wall_mean_ms": 3.3911733836206897,
+    "wall_p95_ms": 4.2126,
+    "frame_mean_ms": 3.3929270377019747,
+    "game_thread_ms": 3.456269551166966,
+    "render_thread_ms": 2.326091885098743,
+    "gpu_frame_ms": 1.7022464272890485,
+    "niagara_gpu_sim_ms": null,
+    "niagara_gt_rt_ms": 0.4599989587432675,
+    "systems": {
+      "NS_Debris_CPU": {
+        "gt_aggregate_ms": 0.4048494793895871,
+        "rt_ms": 0.05514947935368043,
+        "mean_live_count": 0.999640933572711
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_cpu_500.log",
+        "sha256": "a3814618b5a9dac7fe7ced15b247b752478db7c13ed2d9f08887da3f97ef1a68"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_500.frames.csv",
+        "sha256": "a3b07978363acd7a02c990acf573b69825e12b9dfeb4ffb88371a3b8eabff38f"
+      },
+      {
+        "path": "Evidence/Final/sweep_cpu_500.engine.csv.gz",
+        "sha256": "fdf3e987e80fc2bc3d78110e2c33007febbddfddd722208f31e4e34bca57f3e0"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_1000000",
+    "mode": 1,
+    "gpu_count": 1000000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 2095,
+    "wall_mean_ms": 4.513969594272076,
+    "wall_p95_ms": 5.0626,
+    "frame_mean_ms": 4.515281345419847,
+    "game_thread_ms": 3.2355047709923666,
+    "render_thread_ms": 4.503222805343511,
+    "gpu_frame_ms": 3.9650497614503815,
+    "niagara_gpu_sim_ms": 0.36254899809160307,
+    "niagara_gt_rt_ms": 0.12342437977099237,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.08882528625954199,
+        "rt_ms": 0.034599093511450386,
+        "mean_live_count": 0.9995229007633588
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_1000000.log",
+        "sha256": "bcfe7d714f464f72b4c7601e54a76d1b5031918c8a6cabaaf4c09aeb50e4581d"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_1000000.frames.csv",
+        "sha256": "7b4b16650d4c1eb9edaa41ee82ab59a1be7ed70735d7f51a5d475df129da1312"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_1000000.engine.csv.gz",
+        "sha256": "77d17215bd6d6cccfd23c29499e2eea0247e9a93ccda5e0321f6008fe0d33645"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_100000",
+    "mode": 1,
+    "gpu_count": 100000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 2487,
+    "wall_mean_ms": 3.7918446722959387,
+    "wall_p95_ms": 4.7762,
+    "frame_mean_ms": 3.7939853697749197,
+    "game_thread_ms": 3.434388625401929,
+    "render_thread_ms": 3.7819614951768488,
+    "gpu_frame_ms": 2.112979702572347,
+    "niagara_gpu_sim_ms": 0.05497435691318328,
+    "niagara_gt_rt_ms": 0.13454023311897106,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.09943283762057878,
+        "rt_ms": 0.035107395498392285,
+        "mean_live_count": 0.9995980707395499
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_100000.log",
+        "sha256": "db558f62f07383f07013f43ef447a66adaba652ac471a3173ede118ff95e2c65"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_100000.frames.csv",
+        "sha256": "83db7a0f71cdbaed3ccafab258b246ff815b610084fc7942c63efba9e92da424"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_100000.engine.csv.gz",
+        "sha256": "7487c99876fec0f1bdfd0fab4aa3151d4d7b945d7bb110e085c345544b137137"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_2000000",
+    "mode": 1,
+    "gpu_count": 2000000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 1411,
+    "wall_mean_ms": 6.700570729978739,
+    "wall_p95_ms": 7.2857,
+    "frame_mean_ms": 6.70070835694051,
+    "game_thread_ms": 3.0988100566572236,
+    "render_thread_ms": 6.688868555240793,
+    "gpu_frame_ms": 6.108462606232295,
+    "niagara_gpu_sim_ms": 0.753206940509915,
+    "niagara_gt_rt_ms": 0.12877910764872522,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.08827514164305948,
+        "rt_ms": 0.04050396600566573,
+        "mean_live_count": 0.9992917847025495
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_2000000.log",
+        "sha256": "e128baa7b1789ab7ee48a66fcbf5ddffb5d18b82782cf2cb586b1425a68ad2c1"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_2000000.frames.csv",
+        "sha256": "78420786a4ca1056e91425c13963a6e0ff5aae2a40e91530b5025f11869653d7"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_2000000.engine.csv.gz",
+        "sha256": "526a35625fbabefd38698dacc19f6ce97daa545e5fd3fb52bf14bdd78c8bfbc9"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_250000",
+    "mode": 1,
+    "gpu_count": 250000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 2642,
+    "wall_mean_ms": 3.5802051854655565,
+    "wall_p95_ms": 4.3201,
+    "frame_mean_ms": 3.5819021944759744,
+    "game_thread_ms": 3.3007642073401438,
+    "render_thread_ms": 3.569841278849792,
+    "gpu_frame_ms": 2.3951226258040106,
+    "niagara_gpu_sim_ms": 0.08570136208853575,
+    "niagara_gt_rt_ms": 0.13013564131668556,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.09595005675368898,
+        "rt_ms": 0.0341855845629966,
+        "mean_live_count": 0.9996216420734014
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_250000.log",
+        "sha256": "46534c2686c6b7302ced9d527e584bd9564ad8f3345377459ab696680901d878"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_250000.frames.csv",
+        "sha256": "2a41bbc715cee19553ec1cbf1a7831b809d75f3bf6fd56adc107203b8cecd27a"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_250000.engine.csv.gz",
+        "sha256": "6b5b9f669ae50aa001221cf937a5a2c4fe761a09f1df7ed7a33afe9a1a4e921a"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_4000000",
+    "mode": 1,
+    "gpu_count": 4000000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 880,
+    "wall_mean_ms": 10.72971375,
+    "wall_p95_ms": 11.2945,
+    "frame_mean_ms": 10.726965039727583,
+    "game_thread_ms": 3.2282095346197504,
+    "render_thread_ms": 10.712532349602725,
+    "gpu_frame_ms": 10.193309648127128,
+    "niagara_gpu_sim_ms": 1.4568692395005676,
+    "niagara_gt_rt_ms": 0.12870181611804768,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.08588342792281499,
+        "rt_ms": 0.04281838819523269,
+        "mean_live_count": 0.9988649262202043
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_4000000.log",
+        "sha256": "c8895dce584ac3f5fab013e5518723706be6f81317e670f1f43d6c3bc6184e8d"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_4000000.frames.csv",
+        "sha256": "7759b3f0513f798f7e1e213b5ba9ff8efffcb51300e15f64463eee31694a826d"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_4000000.engine.csv.gz",
+        "sha256": "234216274e1dd2f601fe9e08b8b9974927f134bdac3ef1fd6224c004adba7af9"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_500000",
+    "mode": 1,
+    "gpu_count": 500000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 2508,
+    "wall_mean_ms": 3.7648220893141944,
+    "wall_p95_ms": 4.4584,
+    "frame_mean_ms": 3.766592188122758,
+    "game_thread_ms": 3.3686109605420484,
+    "render_thread_ms": 3.752797847748107,
+    "gpu_frame_ms": 2.9472046632124353,
+    "niagara_gpu_sim_ms": 0.17884607413312076,
+    "niagara_gt_rt_ms": 0.13256245516141887,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.09668150657632524,
+        "rt_ms": 0.035880948585093664,
+        "mean_live_count": 0.9996014348345954
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_500000.log",
+        "sha256": "86cddf40ac20f5e45797a252cd569b1b7b96b2a2bdfaf4fa7d903d6e974eaf3d"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_500000.frames.csv",
+        "sha256": "9b8436c479ebfcbbc74a46d3e97d2ec915ca5717f1bac36082598518e333689d"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_500000.engine.csv.gz",
+        "sha256": "ecaa9f62e03a2c5d46c1d648483730c0074fc51d61974a8ffb8011b9d0639e07"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_6000000",
+    "mode": 1,
+    "gpu_count": 6000000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 643,
+    "wall_mean_ms": 14.892867962674961,
+    "wall_p95_ms": 15.5078,
+    "frame_mean_ms": 14.88042546583851,
+    "game_thread_ms": 3.3763076086956523,
+    "render_thread_ms": 14.864161801242236,
+    "gpu_frame_ms": 14.35143152173913,
+    "niagara_gpu_sim_ms": 2.1789121118012424,
+    "niagara_gt_rt_ms": 0.12806102484472048,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.08343571428571428,
+        "rt_ms": 0.04462531055900621,
+        "mean_live_count": 0.9984472049689441
+      }
+    },
+    "within_budget": true,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_6000000.log",
+        "sha256": "a7f09eef6ee5f35a9f018a06c84df9ae6ba4d964c92147b23a47dd2c07789b3e"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_6000000.frames.csv",
+        "sha256": "8a61b937eedf9cb0c95db70d05835bacb3e6a40566d3eb34d9277e074b40f54a"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_6000000.engine.csv.gz",
+        "sha256": "e8547671c5ef7a9123e5c116ad5f0c6aa9bf0b9d3819d3f3834600ad1bd9e469"
+      }
+    ]
+  },
+  {
+    "label": "sweep_gpu_8000000",
+    "mode": 1,
+    "gpu_count": 8000000,
+    "cpu_count": 500,
+    "dynamic_bounds": false,
+    "gpu_port": false,
+    "samples": 378,
+    "wall_mean_ms": 24.905082275132276,
+    "wall_p95_ms": 25.7741,
+    "frame_mean_ms": 24.85863562005277,
+    "game_thread_ms": 3.7084678100263853,
+    "render_thread_ms": 24.837346701846965,
+    "gpu_frame_ms": 24.32918654353562,
+    "niagara_gpu_sim_ms": 2.9076646437994724,
+    "niagara_gt_rt_ms": 0.13869419525065962,
+    "systems": {
+      "NS_Embers_GPU": {
+        "gt_aggregate_ms": 0.08921767810026385,
+        "rt_ms": 0.04947651715039578,
+        "mean_live_count": 0.9973614775725593
+      }
+    },
+    "within_budget": false,
+    "evidence": [
+      {
+        "path": "Evidence/Final/sweep_gpu_8000000.log",
+        "sha256": "67663a36b006049cf3d57e845b6c980dccfe8073708b2e194df2b1e06d2a83a0"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_8000000.frames.csv",
+        "sha256": "e9f2b947675959a349c205662b6ad9fc8097b00fc9551949c42efbff14c03785"
+      },
+      {
+        "path": "Evidence/Final/sweep_gpu_8000000.engine.csv.gz",
+        "sha256": "d30745a4809ec3db079788e0538d41e96c3421d889289de17f51f4eb3f3b8558"
+      }
+    ]
+  }
+]

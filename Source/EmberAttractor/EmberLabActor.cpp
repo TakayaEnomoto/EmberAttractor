@@ -14,6 +14,7 @@
 #include "HAL/PlatformMisc.h"
 #include "HAL/PlatformTime.h"
 #include "InputCoreTypes.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
 #include "Misc/DateTime.h"
 #include "Misc/FileHelper.h"
@@ -33,9 +34,33 @@ namespace
 	TAutoConsoleVariable<int32> CVarEmberCPUCount(
 		TEXT("ember.CPUCount"), 500, TEXT("Target CPU debris count."));
 	TAutoConsoleVariable<float> CVarEmberAttractionStrength(
-		TEXT("ember.AttractionStrength"), 350.0f, TEXT("Ember attraction strength."));
+		TEXT("ember.AttractionStrength"), 4.0f, TEXT("Base black-hole pull: spring stiffness in 1/s^2 inside the pull radius."));
+	TAutoConsoleVariable<int32> CVarEmberGame(
+		TEXT("ember.Game"), 1, TEXT("1: black-hole round (horizon, energy, timer); 0: lab sandbox with a constant workload."));
+	TAutoConsoleVariable<float> CVarEmberRoundSeconds(
+		TEXT("ember.RoundSeconds"), 40.0f, TEXT("Round length in seconds."));
+	TAutoConsoleVariable<float> CVarEmberTargetMass(
+		TEXT("ember.TargetMass"), 35.0f, TEXT("Critical mass needed to win; the released matter is worth 100 when fully hot."));
+	TAutoConsoleVariable<float> CVarEmberCoolSeconds(
+		TEXT("ember.CoolSeconds"), 35.0f, TEXT("Seconds for released matter to cool to zero value."));
+	TAutoConsoleVariable<int32> CVarEmberCPUDynamicBounds(
+		TEXT("ember.CPUDynamicBounds"), 0, TEXT("1: CPU debris uses dynamic bounds (optimization 'before' case); 0: fixed bounds."));
+	TAutoConsoleVariable<int32> CVarEmberDebrisOnGPU(
+		TEXT("ember.DebrisOnGPU"), 0, TEXT("1: debris runs as the GPU port (optimization comparison); 0: CPU simulation."));
 
 	constexpr double AttractorHeight = 200.0;
+	constexpr float MaxEnergy = 100.0f;
+	constexpr float EnergyDrainPerSecond = 30.0f;
+	constexpr float EnergyRegenPerSecond = 14.0f;
+	constexpr float EnergyUnlockThreshold = 25.0f;
+	constexpr float HorizonBaseRadius = 45.0f;
+	constexpr float HorizonRadiusPerMass = 3.5f;
+	constexpr float MassForDoublePull = 30.0f;
+	constexpr float PullBaseRadius = 350.0f;
+	constexpr float PullRadiusPerHorizon = 2.0f;
+	constexpr float LabPullRadius = 4000.0f;
+	constexpr float VortexAcceleration = 120.0f;
+	constexpr int32 GPUExportReservation = 16384;
 	constexpr double RepeatIntervalSeconds = 8.0;
 	constexpr int32 GPUCountPresets[] = {10000, 25000, 50000, 100000, 200000};
 	constexpr int32 CPUCountPresets[] = {500, 1000, 2000, 3500, 5000};
@@ -133,14 +158,20 @@ AEmberLabActor::AEmberLabActor()
 
 	GPUSystem = TSoftObjectPtr<UNiagaraSystem>(FSoftObjectPath(TEXT("/Game/EmberLab/NS_Embers_GPU.NS_Embers_GPU")));
 	CPUSystem = TSoftObjectPtr<UNiagaraSystem>(FSoftObjectPath(TEXT("/Game/EmberLab/NS_Debris_CPU.NS_Debris_CPU")));
+	CPUSystemDynamicBounds = TSoftObjectPtr<UNiagaraSystem>(
+		FSoftObjectPath(TEXT("/Game/EmberLab/NS_Debris_CPU_DynamicBounds.NS_Debris_CPU_DynamicBounds")));
+	DebrisSystemGPUPort = TSoftObjectPtr<UNiagaraSystem>(
+		FSoftObjectPath(TEXT("/Game/EmberLab/NS_Debris_GPUPort.NS_Debris_GPUPort")));
 }
 
 void AEmberLabActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UNiagaraSystem* GPUAsset = GPUSystem.LoadSynchronous();
-	UNiagaraSystem* CPUAsset = CPUSystem.LoadSynchronous();
+	GPUAsset = GPUSystem.LoadSynchronous();
+	CPUAsset = CPUSystem.LoadSynchronous();
+	CPUAssetDynamicBounds = CPUSystemDynamicBounds.LoadSynchronous();
+	DebrisAssetGPUPort = DebrisSystemGPUPort.LoadSynchronous();
 	bHasGPUAsset = GPUAsset != nullptr;
 	bHasCPUAsset = CPUAsset != nullptr;
 	if (GPUAsset)
@@ -160,6 +191,13 @@ void AEmberLabActor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("Ember Lab: missing /Game/EmberLab/NS_Debris_CPU"));
 	}
 
+	if (UMaterialInterface* MarkerMaterial = AttractorMarker->GetMaterial(0))
+	{
+		HoleMaterial = UMaterialInstanceDynamic::Create(MarkerMaterial, this);
+		HoleMaterial->SetVectorParameterValue(TEXT("Color"), FLinearColor(0.0f, 0.0f, 0.0f));
+		AttractorMarker->SetMaterial(0, HoleMaterial);
+	}
+
 	if (APlayerController* Controller = GetWorld()->GetFirstPlayerController())
 	{
 		Controller->SetViewTarget(this);
@@ -171,6 +209,23 @@ void AEmberLabActor::BeginPlay()
 	{
 		CVarEmberMode->Set(FMath::Clamp(RequestedMode, 0, 3), ECVF_SetByCommandline);
 	}
+	int32 RequestedCount = 0;
+	if (FParse::Value(FCommandLine::Get(), TEXT("EmberGPUCount="), RequestedCount))
+	{
+		CVarEmberGPUCount->Set(RequestedCount, ECVF_SetByCommandline);
+	}
+	if (FParse::Value(FCommandLine::Get(), TEXT("EmberCPUCount="), RequestedCount))
+	{
+		CVarEmberCPUCount->Set(RequestedCount, ECVF_SetByCommandline);
+	}
+	if (FParse::Param(FCommandLine::Get(), TEXT("EmberDynamicBounds")))
+	{
+		CVarEmberCPUDynamicBounds->Set(1, ECVF_SetByCommandline);
+	}
+	if (FParse::Param(FCommandLine::Get(), TEXT("EmberDebrisOnGPU")))
+	{
+		CVarEmberDebrisOnGPU->Set(1, ECVF_SetByCommandline);
+	}
 	if (FParse::Param(FCommandLine::Get(), TEXT("EmberProfile")))
 	{
 		float WarmupSeconds = 5.0f;
@@ -178,14 +233,21 @@ void AEmberLabActor::BeginPlay()
 		FParse::Value(FCommandLine::Get(), TEXT("EmberWarmup="), WarmupSeconds);
 		ProfileRequestedDuration = FMath::Clamp(ProfileRequestedDuration, 1.0f, 600.0f);
 		bProfilePending = true;
+		// Scaling captures need a constant particle population, so the round is off.
+		CVarEmberGame->Set(0, ECVF_SetByCommandline);
 		ProfileWarmupEndSeconds = FPlatformTime::Seconds() + FMath::Clamp(WarmupSeconds, 0.0f, 120.0f);
 	}
 	bAutoAttract = FParse::Param(FCommandLine::Get(), TEXT("EmberAutoAttract"));
+	FParse::Value(FCommandLine::Get(), TEXT("EmberShotEvery="), ShotIntervalSeconds);
+	bDemo = FParse::Param(FCommandLine::Get(), TEXT("EmberDemo"));
 
 	BeginPlaySeconds = FPlatformTime::Seconds();
+	DemoPhaseStart = BeginPlaySeconds;
 	LastTickSeconds = BeginPlaySeconds;
 	LastRepeatSeconds = LastTickSeconds;
+	SyncCPUAsset();
 	SyncConsoleVariables();
+	RestartRound();
 }
 
 void AEmberLabActor::Tick(float DeltaSeconds)
@@ -210,21 +272,48 @@ void AEmberLabActor::Tick(float DeltaSeconds)
 	}
 
 	HandleControls();
+	if (bDemo)
+	{
+		UpdateDemo(Now);
+	}
+	SyncCPUAsset();
 	SyncConsoleVariables();
 	UpdateAttractor();
-	GPUComponent->SetVariablePosition(TEXT("User.AttractorPosition"), AttractorPosition);
-	CPUComponent->SetVariablePosition(TEXT("User.AttractorPosition"), AttractorPosition);
-	const float Enabled = bAttractionActive ? 1.0f : 0.0f;
-	GPUComponent->SetVariableFloat(TEXT("User.AttractionEnabled"), Enabled);
-	CPUComponent->SetVariableFloat(TEXT("User.AttractionEnabled"), Enabled);
-	GPUComponent->SetVariableFloat(TEXT("User.AttractionStrength"), AttractionStrength * Enabled);
-	CPUComponent->SetVariableFloat(TEXT("User.AttractionStrength"), AttractionStrength * Enabled);
-	AttractorLight->SetVisibility(bAttractionActive);
+	UpdateGameplay(DeltaSeconds);
 
-	if (bAutoRepeat && Now - LastRepeatSeconds >= RepeatIntervalSeconds)
+	// Gameplay -> simulation: mass grows the horizon and the pull; energy gates the pull.
+	const float Enabled = bAttractionActive ? 1.0f : 0.0f;
+	const float MassScale = 1.0f + Mass / MassForDoublePull;
+	const float Strength = AttractionStrength * MassScale * Enabled;
+	for (UNiagaraComponent* Component : {GPUComponent.Get(), CPUComponent.Get()})
+	{
+		Component->SetVariablePosition(TEXT("User.AttractorPosition"), AttractorPosition);
+		Component->SetVariableFloat(TEXT("User.AttractionEnabled"), Enabled);
+		Component->SetVariableFloat(TEXT("User.AttractionStrength"), Strength);
+		Component->SetVariableFloat(TEXT("User.VortexStrength"), VortexAcceleration * MassScale * Enabled);
+		Component->SetVariableFloat(TEXT("User.PullRadius"),
+			bGameEnabled ? PullBaseRadius + PullRadiusPerHorizon * HorizonRadius : LabPullRadius);
+		Component->SetVariableFloat(TEXT("User.HorizonRadius"), HorizonRadius);
+		Component->SetVariableFloat(TEXT("User.CoolSeconds"), CoolSeconds);
+	}
+	const float MarkerRadius = FMath::Max(HorizonRadius, 18.0f);
+	AttractorMarker->SetRelativeScale3D(FVector(MarkerRadius / 50.0f));
+	AttractorLight->SetVisibility(bAttractionActive || bGameEnabled);
+	AttractorLight->SetIntensity(bAttractionActive ? 20000.0f : 4000.0f);
+	AttractorLight->SetAttenuationRadius(500.0f + 4.0f * HorizonRadius);
+
+	if (bAutoRepeat && !bGameEnabled && Now - LastRepeatSeconds >= RepeatIntervalSeconds)
 	{
 		ApplyNiagaraParameters(true);
 		LastRepeatSeconds = Now;
+	}
+
+	if (ShotIntervalSeconds > 0.0f && Now - LastShotSeconds >= ShotIntervalSeconds)
+	{
+		// Developer aid for checking visuals in unattended runs.
+		LastShotSeconds = Now;
+		FScreenshotRequest::RequestScreenshot(FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Profiling"), TEXT("Shots"),
+			FString::Printf(TEXT("Shot_%03d.png"), ShotIndex++)), true, false);
 	}
 
 	if (bProfilePending && Now >= ProfileWarmupEndSeconds)
@@ -278,7 +367,7 @@ void AEmberLabActor::HandleControls()
 	if (Controller->WasInputKeyJustPressed(EKeys::Three)) CVarEmberMode->Set(3, ECVF_SetByConsole);
 	if (Controller->WasInputKeyJustPressed(EKeys::LeftBracket)) AdjustCount(-1);
 	if (Controller->WasInputKeyJustPressed(EKeys::RightBracket)) AdjustCount(1);
-	if (Controller->WasInputKeyJustPressed(EKeys::R)) ApplyNiagaraParameters(true);
+	if (Controller->WasInputKeyJustPressed(EKeys::R)) RestartRound();
 	if (Controller->WasInputKeyJustPressed(EKeys::F))
 	{
 		bAutoRepeat = !bAutoRepeat;
@@ -306,14 +395,19 @@ void AEmberLabActor::UpdateAttractor()
 		return;
 	}
 
-	bAttractionActive = Controller->IsInputKeyDown(EKeys::LeftMouseButton) && Mode != 0;
+	if (UpdateDemoAttractor())
+	{
+		return;
+	}
+	const bool bRoundAllowsPull = !bGameEnabled || (RoundState == EEmberRoundState::Playing && !bPullLocked);
+	bAttractionActive = Controller->IsInputKeyDown(EKeys::LeftMouseButton) && Mode != 0 && bRoundAllowsPull;
 	if (bAutoAttract)
 	{
 		const double Elapsed = FPlatformTime::Seconds() - BeginPlaySeconds;
 		AttractorPosition.X = 600.0 * FMath::Cos(Elapsed * 0.6);
 		AttractorPosition.Y = 450.0 * FMath::Sin(Elapsed * 0.9);
 		AttractorMarker->SetWorldLocation(AttractorPosition);
-		bAttractionActive = Mode != 0;
+		bAttractionActive = Mode != 0 && bRoundAllowsPull;
 		return;
 	}
 	FVector RayOrigin;
@@ -334,23 +428,262 @@ void AEmberLabActor::UpdateAttractor()
 void AEmberLabActor::SyncConsoleVariables()
 {
 	const int32 NewMode = FMath::Clamp(CVarEmberMode.GetValueOnGameThread(), 0, 3);
-	const int32 NewGPUCount = FMath::Clamp(CVarEmberGPUCount.GetValueOnGameThread(), 0, 1000000);
+	const int32 NewGPUCount = FMath::Clamp(CVarEmberGPUCount.GetValueOnGameThread(), 0, 16000000);
 	const int32 NewCPUCount = FMath::Clamp(CVarEmberCPUCount.GetValueOnGameThread(), 0, 100000);
 	const float NewStrength = FMath::Max(0.0f, CVarEmberAttractionStrength.GetValueOnGameThread());
+	const bool bNewGame = CVarEmberGame.GetValueOnGameThread() != 0;
 	const bool bNeedsReset = NewGPUCount != GPUCount || NewCPUCount != CPUCount;
-	const bool bChanged = NewMode != Mode || bNeedsReset || NewStrength != AttractionStrength;
+	const bool bRoundChanged = NewMode != Mode || bNeedsReset || bNewGame != bGameEnabled;
+	const bool bChanged = bRoundChanged || NewStrength != AttractionStrength;
+	const bool bFirstSync = Mode < 0;
 	Mode = NewMode;
 	GPUCount = NewGPUCount;
 	CPUCount = NewCPUCount;
 	AttractionStrength = NewStrength;
-	if (bChanged)
+	bGameEnabled = bNewGame;
+	TargetMass = FMath::Max(1.0f, CVarEmberTargetMass.GetValueOnGameThread());
+	CoolSeconds = FMath::Max(1.0f, CVarEmberCoolSeconds.GetValueOnGameThread());
+	if (bRoundChanged && !bFirstSync)
+	{
+		// The matter supply changed, so the old round's mass and timer are meaningless.
+		RestartRound();
+	}
+	else if (bChanged)
 	{
 		ApplyNiagaraParameters(bNeedsReset);
 	}
 }
 
+namespace EmberDemo
+{
+	// Phase order of the scripted showcase; each phase logs its start for video editing.
+	enum : int32 { Warmup, WinRound, WinHold, ColdRound, ColdHold, GPUMillion, GPUFourMillion, CPUDebris, DebrisPort, Done };
+}
+
+void AEmberLabActor::SetDemoPhase(int32 Phase, double Now)
+{
+	DemoPhase = Phase;
+	DemoPhaseStart = Now;
+	UE_LOG(LogTemp, Display, TEXT("Ember Demo: phase %d at %.3f"), Phase, Now - BeginPlaySeconds);
+	auto Console = [this](const TCHAR* Command) { GEngine->Exec(GetWorld(), Command); };
+	switch (Phase)
+	{
+	case EmberDemo::WinRound:
+		RestartRound();
+		break;
+	case EmberDemo::ColdRound:
+		// A short, passive round so the matter visibly goes cold before critical mass.
+		CVarEmberCoolSeconds->Set(10.0f, ECVF_SetByConsole);
+		CVarEmberRoundSeconds->Set(13.0f, ECVF_SetByConsole);
+		CoolSeconds = 10.0f;
+		RestartRound();
+		break;
+	case EmberDemo::GPUMillion:
+		CVarEmberCoolSeconds->Set(35.0f, ECVF_SetByConsole);
+		CVarEmberRoundSeconds->Set(40.0f, ECVF_SetByConsole);
+		CVarEmberGame->Set(0, ECVF_SetByConsole);
+		CVarEmberMode->Set(1, ECVF_SetByConsole);
+		CVarEmberGPUCount->Set(1000000, ECVF_SetByConsole);
+		// A stronger pull than the game default so the scale shots visibly swirl.
+		CVarEmberAttractionStrength->Set(14.0f, ECVF_SetByConsole);
+		bAutoAttract = true;
+		Console(TEXT("stat fps"));
+		Console(TEXT("stat unit"));
+		Console(TEXT("fx.Niagara.Debug.Hud Enabled=1 OverviewEnabled=1 OverviewLocation=1250,40"));
+		break;
+	case EmberDemo::GPUFourMillion:
+		CVarEmberGPUCount->Set(4000000, ECVF_SetByConsole);
+		break;
+	case EmberDemo::CPUDebris:
+		CVarEmberMode->Set(2, ECVF_SetByConsole);
+		CVarEmberCPUCount->Set(5000, ECVF_SetByConsole);
+		break;
+	case EmberDemo::DebrisPort:
+		CVarEmberDebrisOnGPU->Set(1, ECVF_SetByConsole);
+		CVarEmberCPUCount->Set(20000, ECVF_SetByConsole);
+		break;
+	case EmberDemo::Done:
+		FPlatformMisc::RequestExit(false);
+		break;
+	default:
+		break;
+	}
+}
+
+void AEmberLabActor::UpdateDemo(double Now)
+{
+	const double Elapsed = Now - DemoPhaseStart;
+	const bool bRoundOver = RoundState != EEmberRoundState::Playing;
+	switch (DemoPhase)
+	{
+	case EmberDemo::Warmup:         if (Elapsed > 5.0) SetDemoPhase(EmberDemo::WinRound, Now); break;
+	case EmberDemo::WinRound:       if (bRoundOver || Elapsed > 40.0) SetDemoPhase(EmberDemo::WinHold, Now); break;
+	case EmberDemo::WinHold:        if (Elapsed > 4.0) SetDemoPhase(EmberDemo::ColdRound, Now); break;
+	case EmberDemo::ColdRound:      if (bRoundOver || Elapsed > 15.0) SetDemoPhase(EmberDemo::ColdHold, Now); break;
+	case EmberDemo::ColdHold:       if (Elapsed > 3.0) SetDemoPhase(EmberDemo::GPUMillion, Now); break;
+	case EmberDemo::GPUMillion:     if (Elapsed > 9.0) SetDemoPhase(EmberDemo::GPUFourMillion, Now); break;
+	case EmberDemo::GPUFourMillion: if (Elapsed > 9.0) SetDemoPhase(EmberDemo::CPUDebris, Now); break;
+	case EmberDemo::CPUDebris:      if (Elapsed > 9.0) SetDemoPhase(EmberDemo::DebrisPort, Now); break;
+	case EmberDemo::DebrisPort:     if (Elapsed > 9.0) SetDemoPhase(EmberDemo::Done, Now); break;
+	default: break;
+	}
+}
+
+bool AEmberLabActor::UpdateDemoAttractor()
+{
+	if (!bDemo || DemoPhase > EmberDemo::ColdHold)
+	{
+		return false;
+	}
+	// Sweep an outward spiral over the debris field. In the winning round the pull is used
+	// in bursts (stop near empty, resume at half a tank); the cold round never pulls.
+	const double Elapsed = FPlatformTime::Seconds() - DemoPhaseStart;
+	const double Radius = 120.0 + 520.0 * FMath::Min(Elapsed / 24.0, 1.0);
+	const double Angle = Elapsed * 1.15;
+	AttractorPosition.X = Radius * FMath::Cos(Angle);
+	AttractorPosition.Y = Radius * FMath::Sin(Angle);
+	AttractorMarker->SetWorldLocation(AttractorPosition);
+	if (DemoPhase == EmberDemo::WinRound && RoundState == EEmberRoundState::Playing && !bPullLocked)
+	{
+		bDemoPulling = bDemoPulling ? Energy > 8.0f : Energy >= 55.0f;
+	}
+	else
+	{
+		bDemoPulling = false;
+	}
+	bAttractionActive = bDemoPulling;
+	return true;
+}
+
+void AEmberLabActor::SyncCPUAsset()
+{
+	const bool bWantGPUPort = CVarEmberDebrisOnGPU.GetValueOnGameThread() != 0 && DebrisAssetGPUPort;
+	const bool bWantDynamic = !bWantGPUPort && CVarEmberCPUDynamicBounds.GetValueOnGameThread() != 0 && CPUAssetDynamicBounds;
+	UNiagaraSystem* Desired = bWantGPUPort ? DebrisAssetGPUPort.Get()
+		: bWantDynamic ? CPUAssetDynamicBounds.Get() : CPUAsset.Get();
+	if (!Desired || CPUComponent->GetAsset() == Desired)
+	{
+		return;
+	}
+	bDynamicBounds = bWantDynamic;
+	const bool bWasActive = CPUComponent->IsActive();
+	CPUComponent->DeactivateImmediate();
+	CPUComponent->SetAsset(Desired);
+	UE_LOG(LogTemp, Display, TEXT("Ember Lab: CPU debris uses %s"), *Desired->GetName());
+	if (bWasActive)
+	{
+		ApplyNiagaraParameters(true);
+	}
+}
+
+void AEmberLabActor::RestartRound()
+{
+	RoundState = EEmberRoundState::Playing;
+	Mass = 0.0f;
+	Energy = MaxEnergy;
+	bPullLocked = false;
+	TimeRemaining = FMath::Max(5.0f, CVarEmberRoundSeconds.GetValueOnGameThread());
+	HorizonRadius = bGameEnabled ? HorizonBaseRadius : 0.0f;
+	ConsumedGPU = 0;
+	ConsumedCPU = 0;
+	SaturatedReadbacks = 0;
+	ApplyNiagaraParameters(true);
+}
+
+void AEmberLabActor::UpdateGameplay(float DeltaSeconds)
+{
+	if (!bGameEnabled)
+	{
+		HorizonRadius = 0.0f;
+		return;
+	}
+	if (RoundState == EEmberRoundState::Playing)
+	{
+		if (bAttractionActive)
+		{
+			Energy = FMath::Max(0.0f, Energy - EnergyDrainPerSecond * DeltaSeconds);
+			if (Energy <= 0.0f)
+			{
+				bPullLocked = true;
+			}
+		}
+		else
+		{
+			Energy = FMath::Min(MaxEnergy, Energy + EnergyRegenPerSecond * DeltaSeconds);
+			if (bPullLocked && Energy >= EnergyUnlockThreshold)
+			{
+				bPullLocked = false;
+			}
+		}
+		TimeRemaining = FMath::Max(0.0f, TimeRemaining - DeltaSeconds);
+		if (Mass >= TargetMass)
+		{
+			RoundState = EEmberRoundState::Won;
+		}
+		else if (TimeRemaining <= 0.0f)
+		{
+			RoundState = EEmberRoundState::Lost;
+		}
+	}
+	HorizonRadius = HorizonBaseRadius + HorizonRadiusPerMass * Mass;
+
+	const double Now = FPlatformTime::Seconds();
+	if (Now - LastStatusLogSeconds >= 5.0)
+	{
+		LastStatusLogSeconds = Now;
+		UE_LOG(LogTemp, Display, TEXT("Ember Lab: round=%d mass=%.2f/%.0f energy=%.0f time=%.1f horizon=%.0f consumed GPU=%d CPU=%d saturated=%d"),
+			static_cast<int32>(RoundState), Mass, TargetMass, Energy, TimeRemaining, HorizonRadius,
+			ConsumedGPU, ConsumedCPU, SaturatedReadbacks);
+	}
+}
+
+void AEmberLabActor::ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data,
+	UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset)
+{
+	// "GPU" here means the dust system; the debris GPU port still counts as debris.
+	const bool bFromGPU = NiagaraSystem != nullptr && NiagaraSystem == GPUAsset;
+	if (bFromGPU)
+	{
+		ConsumedGPU += Data.Num();
+		if (Data.Num() >= GPUExportReservation)
+		{
+			++SaturatedReadbacks;
+		}
+	}
+	else
+	{
+		ConsumedCPU += Data.Num();
+	}
+	if (!bGameEnabled || RoundState != EEmberRoundState::Playing)
+	{
+		return;
+	}
+
+	// All released matter is worth 100 mass when hot; each system's share is spread over
+	// its particle count so the round plays the same at every count preset.
+	const bool bBoth = (Mode & 3) == 3;
+	const float Share = bBoth ? (bFromGPU ? 60.0f : 40.0f) : 100.0f;
+	const int32 Count = bFromGPU ? GPUCount : CPUCount;
+	if (Count <= 0)
+	{
+		return;
+	}
+	const float ValuePerParticle = Share / Count;
+	float Gained = 0.0f;
+	for (const FBasicParticleData& Particle : Data)
+	{
+		// Size carries Particles.Age; matter cools linearly to zero value.
+		Gained += ValuePerParticle * FMath::Clamp(1.0f - Particle.Size / CoolSeconds, 0.0f, 1.0f);
+	}
+	Mass += Gained;
+}
+
 void AEmberLabActor::ApplyNiagaraParameters(bool bForceReset)
 {
+	GPUComponent->SetVariableObject(TEXT("User.ExportHandler"), this);
+	CPUComponent->SetVariableObject(TEXT("User.ExportHandler"), this);
+	GPUComponent->SetVariableFloat(TEXT("User.HorizonRadius"), HorizonRadius);
+	CPUComponent->SetVariableFloat(TEXT("User.HorizonRadius"), HorizonRadius);
 	GPUComponent->SetVariableInt(TEXT("User.ParticleCount"), GPUCount);
 	CPUComponent->SetVariableInt(TEXT("User.ParticleCount"), CPUCount);
 	const float AppliedStrength = bAttractionActive ? AttractionStrength : 0.0f;

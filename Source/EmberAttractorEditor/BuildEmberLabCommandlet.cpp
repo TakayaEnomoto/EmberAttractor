@@ -12,6 +12,7 @@
 #include "Materials/MaterialExpressionParticleColor.h"
 #include "NiagaraEditorUtilities.h"
 #include "NiagaraCommon.h"
+#include "NiagaraDataInterfaceExport.h"
 #include "EdGraphSchema_Niagara.h"
 #include "NiagaraEmitter.h"
 #include "NiagaraEmitterFactoryNew.h"
@@ -132,6 +133,157 @@ static bool BindInput(UNiagaraNodeFunctionCall* Module, const TCHAR* InputName,
 	return Pin.LinkedTo.Num() == 1;
 }
 
+static bool FindModuleInput(UNiagaraNodeFunctionCall* Module, const FString& InputName,
+	FString& OutName, FNiagaraTypeDefinition& OutType, TArray<FString>* OutSeen = nullptr)
+{
+	UNiagaraScriptSource* ModuleSource = Module && Module->FunctionScript
+		? Cast<UNiagaraScriptSource>(Module->FunctionScript->GetLatestSource()) : nullptr;
+	if (!ModuleSource || !ModuleSource->NodeGraph)
+	{
+		return false;
+	}
+	// Exact names win; a prefix match tolerates display suffixes such as "Float To Send (Size)".
+	bool bFound = false;
+	for (const UEdGraphNode* GraphNode : ModuleSource->NodeGraph->Nodes)
+	{
+		for (const UEdGraphPin* GraphPin : GraphNode->Pins)
+		{
+			const FString PinName = GraphPin->PinName.ToString();
+			if (!PinName.StartsWith(TEXT("Module.")))
+			{
+				continue;
+			}
+			const FString Short = PinName.RightChop(7);
+			if (OutSeen)
+			{
+				OutSeen->AddUnique(FString::Printf(TEXT("%s:%s"), *Short,
+					*UEdGraphSchema_Niagara::PinToTypeDefinition(GraphPin).GetName()));
+			}
+			if (Short == InputName || (!bFound && Short.StartsWith(InputName)))
+			{
+				OutName = Short;
+				OutType = UEdGraphSchema_Niagara::PinToTypeDefinition(GraphPin);
+				bFound = true;
+				if (Short == InputName && !OutSeen)
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return bFound;
+}
+
+static UEdGraphPin* GetInputOverridePin(UNiagaraNodeFunctionCall* Module, const TCHAR* InputName,
+	FNiagaraTypeDefinition& OutType)
+{
+	FString Name;
+	if (!Module || !FindModuleInput(Module, InputName, Name, OutType))
+	{
+		TArray<FString> Seen;
+		FindModuleInput(Module, TEXT("\x01"), Name, OutType, &Seen);
+		Error(FString::Printf(TEXT("Module input missing: %s.%s available=[%s]"),
+			Module ? *Module->GetFunctionName() : TEXT("null"), InputName, *FString::Join(Seen, TEXT(", "))));
+		return nullptr;
+	}
+	const FNiagaraParameterHandle Alias = FNiagaraParameterHandle::CreateAliasedModuleParameterHandle(
+		FNiagaraParameterHandle::CreateModuleParameterHandle(FName(*Name)), Module);
+	return &FNiagaraStackGraphUtilities::GetOrCreateStackFunctionInputOverridePin(*Module, Alias, OutType, FGuid(), FGuid());
+}
+
+/** Links a module or dynamic-input input to any named parameter (User., Particles., ...). */
+static bool LinkInput(UNiagaraNodeFunctionCall* Module, const TCHAR* InputName, const TCHAR* ParameterName)
+{
+	FNiagaraTypeDefinition Type;
+	UEdGraphPin* Pin = GetInputOverridePin(Module, InputName, Type);
+	if (!Pin)
+	{
+		return false;
+	}
+	const FNiagaraVariableBase Linked(Type, FName(ParameterName));
+	TSet<FNiagaraVariableBase> KnownParameters;
+	KnownParameters.Add(Linked);
+	FNiagaraStackGraphUtilities::SetLinkedParameterValueForFunctionInput(*Pin, Linked, KnownParameters);
+	Note(FString::Printf(TEXT("Linked %s.%s <- %s (%s)"), *Module->GetFunctionName(), InputName, ParameterName, *Type.GetName()));
+	return Pin->LinkedTo.Num() == 1;
+}
+
+/** Replaces an input with a dynamic-input script and returns the new function node. */
+static UNiagaraNodeFunctionCall* SetDynamicInput(UNiagaraNodeFunctionCall* Module, const TCHAR* InputName, const TCHAR* ScriptPath)
+{
+	FNiagaraTypeDefinition Type;
+	UEdGraphPin* Pin = GetInputOverridePin(Module, InputName, Type);
+	UNiagaraScript* Script = Pin ? LoadModule(ScriptPath) : nullptr;
+	if (!Script)
+	{
+		return nullptr;
+	}
+	UNiagaraNodeFunctionCall* DynamicInput = nullptr;
+	FNiagaraStackGraphUtilities::SetDynamicInputForFunctionInput(*Pin, Script, DynamicInput);
+	Note(FString::Printf(TEXT("Dynamic input %s.%s <- %s"), *Module->GetFunctionName(), InputName,
+		DynamicInput ? *DynamicInput->GetFunctionName() : TEXT("null")));
+	return DynamicInput;
+}
+
+/** Sets a static-switch pin to the enumerator whose display name contains Include but not Exclude. */
+static bool SetStaticSwitch(UNiagaraNodeFunctionCall* Node, const TCHAR* PinPrefix, const TCHAR* Include, const TCHAR* Exclude)
+{
+	TArray<FString> Seen;
+	for (UEdGraphPin* Pin : Node ? Node->Pins : TArray<UEdGraphPin*>())
+	{
+		if (Pin->Direction != EGPD_Input)
+		{
+			continue;
+		}
+		const FNiagaraTypeDefinition Type = UEdGraphSchema_Niagara::PinToTypeDefinition(Pin);
+		const UEnum* Enum = Type.GetEnum();
+		Seen.Add(FString::Printf(TEXT("%s=%s"), *Pin->PinName.ToString(), *Pin->DefaultValue));
+		if (!Enum || !Pin->PinName.ToString().StartsWith(PinPrefix))
+		{
+			continue;
+		}
+		for (int32 Index = 0; Index < Enum->NumEnums() - 1; ++Index)
+		{
+			const FString Display = Enum->GetDisplayNameTextByIndex(Index).ToString();
+			const FString Short = Enum->GetNameStringByIndex(Index);
+			Seen.Add(FString::Printf(TEXT("  %s='%s'"), *Short, *Display));
+			if (Display.Contains(Include) && !Display.Contains(Exclude))
+			{
+				Pin->DefaultValue = Short;
+				Node->MarkNodeRequiresSynchronization(TEXT("EmberLab static switch"), true);
+				Note(FString::Printf(TEXT("Static switch %s.%s = %s (%s)"), *Node->GetFunctionName(),
+					*Pin->PinName.ToString(), *Short, *Display));
+				return true;
+			}
+		}
+	}
+	Error(FString::Printf(TEXT("Static switch %s/%s not found on %s pins=[%s]"), PinPrefix, Include,
+		Node ? *Node->GetFunctionName() : TEXT("null"), *FString::Join(Seen, TEXT(", "))));
+	return false;
+}
+
+template <typename ValueType>
+static bool SetLocalInput(UNiagaraNodeFunctionCall* Module, UNiagaraScript* Script,
+	const FString& UniqueEmitterName, const TCHAR* InputName, const ValueType& Value)
+{
+	FString Name;
+	FNiagaraTypeDefinition Type;
+	if (!Module || !Script || !FindModuleInput(Module, InputName, Name, Type) || Type.GetSize() != sizeof(ValueType))
+	{
+		Error(FString::Printf(TEXT("Local input missing or wrong size: %s.%s"),
+			Module ? *Module->GetFunctionName() : TEXT("null"), InputName));
+		return false;
+	}
+	const FNiagaraParameterHandle Alias = FNiagaraParameterHandle::CreateAliasedModuleParameterHandle(
+		FNiagaraParameterHandle::CreateModuleParameterHandle(FName(*Name)), Module);
+	FNiagaraVariable Parameter(Type, Alias.GetParameterHandleString());
+	Parameter = FNiagaraUtilities::ConvertVariableToRapidIterationConstantName(
+		Parameter, *UniqueEmitterName, Script->GetUsage());
+	Parameter.SetValue(Value);
+	Script->RapidIterationParameters.SetParameterData(Parameter.GetData(), Parameter, true);
+	return true;
+}
+
 static void SetFloatInput(UNiagaraNodeFunctionCall* Module, UNiagaraScript* Script,
 	const FString& UniqueEmitterName, const TCHAR* InputName, float Value)
 {
@@ -169,10 +321,15 @@ static UNiagaraNodeOutput* OutputFor(FVersionedNiagaraEmitterData* Data, ENiagar
 }
 
 static bool AddUserParameter(UNiagaraSystem* System, const TCHAR* Name,
-	FNiagaraTypeDefinition Type, int32 IntDefault = 0, float FloatDefault = 0.0f)
+	FNiagaraTypeDefinition Type, int32 IntDefault = 0, float FloatDefault = 0.0f,
+	FLinearColor ColorDefault = FLinearColor::White)
 {
 	FNiagaraVariable Variable(Type, FName(Name));
-	if (Type == FNiagaraTypeDefinition::GetIntDef())
+	if (Type == FNiagaraTypeDefinition::GetColorDef())
+	{
+		Variable.SetValue(ColorDefault);
+	}
+	else if (Type == FNiagaraTypeDefinition::GetIntDef())
 	{
 		Variable.SetValue(IntDefault);
 	}
@@ -254,6 +411,13 @@ static bool SaveSystem(UNiagaraSystem* System)
 			return false;
 		}
 	}
+	for (const FNiagaraEmitterHandle& Handle : System->GetEmitterHandles())
+	{
+		// Keep the translated particle-update HLSL beside the build report for review.
+		const UNiagaraScript* Update = Handle.GetEmitterData()->UpdateScriptProps.Script;
+		FFileHelper::SaveStringToFile(Update->GetVMExecutableData().LastHlslTranslation,
+			*(FPaths::ProjectSavedDir() / FString::Printf(TEXT("Hlsl_%s_ParticleUpdate.hlsl"), *System->GetName())));
+	}
 	UPackage* Package = System->GetOutermost();
 	Package->MarkPackageDirty();
 	const FString Filename = FPackageName::LongPackageNameToFilename(Package->GetName(), FPackageName::GetAssetPackageExtension());
@@ -267,7 +431,8 @@ static bool SaveSystem(UNiagaraSystem* System)
 	return bSaved;
 }
 
-static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count)
+/** bGPU selects the dust look (sprites, no collision); bPortToGPU runs the debris look on the GPU. */
+static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count, bool bDynamicBounds = false, bool bPortToGPU = false)
 {
 	const FString PackageName = FString::Printf(TEXT("%s/%s"), AssetFolder, AssetName);
 	UPackage* Package = CreatePackage(*PackageName);
@@ -312,12 +477,18 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count)
 		Error(TEXT("Emitter copy invalid"));
 		return false;
 	}
-	Data->SimTarget = bGPU ? ENiagaraSimTarget::GPUComputeSim : ENiagaraSimTarget::CPUSim;
+	const bool bGPUSim = bGPU || bPortToGPU;
+	Data->SimTarget = bGPUSim ? ENiagaraSimTarget::GPUComputeSim : ENiagaraSimTarget::CPUSim;
 	Data->FixedBounds = FBox(FVector(-2000.0, -2000.0, -300.0), FVector(2000.0, 2000.0, 1600.0));
-	Data->CalculateBoundsMode = ENiagaraEmitterCalculateBoundMode::Fixed;
+	// The dynamic variant exists only as the "before" case of the measured bounds optimization.
+	Data->CalculateBoundsMode = bDynamicBounds
+		? ENiagaraEmitterCalculateBoundMode::Dynamic : ENiagaraEmitterCalculateBoundMode::Fixed;
+	if (bGPUSim)
+	{
+		Data->MaxGPUParticlesSpawnPerFrame = 16000000;
+	}
 	if (bGPU)
 	{
-		Data->MaxGPUParticlesSpawnPerFrame = 1000000;
 		for (UNiagaraRendererProperties* Renderer : Data->GetRenderers())
 		{
 			if (UNiagaraSpriteRendererProperties* Sprite = Cast<UNiagaraSpriteRendererProperties>(Renderer))
@@ -352,7 +523,16 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count)
 		AddUserParameter(System, TEXT("User.ParticleCount"), FNiagaraTypeDefinition::GetIntDef(), Count) &&
 		AddUserParameter(System, TEXT("User.AttractorPosition"), FNiagaraTypeDefinition::GetPositionDef()) &&
 		AddUserParameter(System, TEXT("User.AttractionStrength"), FNiagaraTypeDefinition::GetFloatDef(), 0, 400.0f) &&
-		AddUserParameter(System, TEXT("User.AttractionEnabled"), FNiagaraTypeDefinition::GetFloatDef(), 0, 1.0f);
+		AddUserParameter(System, TEXT("User.AttractionEnabled"), FNiagaraTypeDefinition::GetFloatDef(), 0, 1.0f) &&
+		AddUserParameter(System, TEXT("User.HorizonRadius"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.VortexStrength"), FNiagaraTypeDefinition::GetFloatDef(), 0, 0.0f) &&
+		AddUserParameter(System, TEXT("User.PullRadius"), FNiagaraTypeDefinition::GetFloatDef(), 0, 4000.0f) &&
+		AddUserParameter(System, TEXT("User.CoolSeconds"), FNiagaraTypeDefinition::GetFloatDef(), 0, 30.0f) &&
+		AddUserParameter(System, TEXT("User.HotColor"), FNiagaraTypeDefinition::GetColorDef(), 0, 0.0f,
+			bGPU ? FLinearColor(1.0f, 0.18f, 0.015f, 0.72f) : FLinearColor(1.4f, 0.55f, 0.12f, 1.0f)) &&
+		AddUserParameter(System, TEXT("User.ColdColor"), FNiagaraTypeDefinition::GetColorDef(), 0, 0.0f,
+			bGPU ? FLinearColor(0.05f, 0.012f, 0.02f, 0.35f) : FLinearColor(0.08f, 0.1f, 0.14f, 1.0f)) &&
+		AddUserParameter(System, TEXT("User.ExportHandler"), FNiagaraTypeDefinition::GetUObjectDef());
 	if (!bParams)
 	{
 		return false;
@@ -371,6 +551,7 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count)
 	Source->NodeGraph->GetNodesOfClass(FunctionNodes);
 	bool bDisabledSpawnRate = false;
 	bool bSetOneLoop = false;
+	UNiagaraNodeFunctionCall* ColorModule = nullptr;
 	for (UNiagaraNodeFunctionCall* Node : FunctionNodes)
 	{
 		if (Node->FunctionScript && Node->FunctionScript->GetPathName().Contains(TEXT("/SpawnRate.")))
@@ -380,7 +561,7 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count)
 		}
 		if (Node->FunctionScript && Node->FunctionScript->GetPathName().Contains(TEXT("/Color.")))
 		{
-			FNiagaraStackGraphUtilities::SetModuleIsEnabled(*Node, false);
+			ColorModule = Node;
 		}
 		if (Node->FunctionScript && Node->FunctionScript->GetPathName().Contains(TEXT("/AddVelocity.")))
 		{
@@ -456,23 +637,124 @@ static bool BuildSystem(const TCHAR* AssetName, bool bGPU, int32 Count)
 		? TEXT("(R=1.0,G=0.18,B=0.015,A=0.72)")
 		: TEXT("(R=0.12,G=0.6,B=1.4,A=1.0)");
 	FNiagaraStackGraphUtilities::AddParameterModuleToStack({Color}, *ParticleSpawn, INDEX_NONE, {ColorValue});
-	UNiagaraNodeFunctionCall* Attractor = AddModule(TEXT("/Niagara/Modules/Update/Forces/V2/PointAttractionForce.PointAttractionForce"), ParticleUpdate, 2);
-	SetFloatInput(Attractor, Data->UpdateScriptProps.Script, Emitter->GetUniqueEmitterName(), TEXT("Attraction Radius"), 4000.0f);
-	SetFloatInput(Attractor, Data->UpdateScriptProps.Script, Emitter->GetUniqueEmitterName(), TEXT("Kill Radius"), 0.0f);
+	UNiagaraScript* UpdateScript = Data->UpdateScriptProps.Script;
+	const FString EmitterName = Emitter->GetUniqueEmitterName();
+
+	// Event horizon readback. Particles inside User.HorizonRadius are exported to the
+	// gameplay callback and killed by the next module using the export's own result,
+	// so every consumed particle is reported exactly once. Particles.Age travels in the
+	// Size slot; gameplay converts it into remaining heat.
+	UNiagaraNodeFunctionCall* Export = AddModule(TEXT("/Niagara/Modules/ExportParticleData/ExportParticleDataToBlueprint.ExportParticleDataToBlueprint"), ParticleUpdate, 2);
+	FNiagaraTypeDefinition ExportType;
+	UEdGraphPin* ExportPin = GetInputOverridePin(Export, TEXT("Export Particle Data Interface"), ExportType);
+	UNiagaraDataInterface* ExportInterface = nullptr;
+	if (ExportPin)
+	{
+		FString ExportInputName;
+		FindModuleInput(Export, TEXT("Export Particle Data Interface"), ExportInputName, ExportType);
+		const FNiagaraParameterHandle ExportAlias = FNiagaraParameterHandle::CreateAliasedModuleParameterHandle(
+			FNiagaraParameterHandle::CreateModuleParameterHandle(FName(*ExportInputName)), Export);
+		FNiagaraStackGraphUtilities::SetDataInterfaceValueForFunctionInput(*ExportPin,
+			UNiagaraDataInterfaceExport::StaticClass(), ExportAlias.GetParameterHandleString().ToString(), ExportInterface);
+	}
+	UNiagaraDataInterfaceExport* ExportData = Cast<UNiagaraDataInterfaceExport>(ExportInterface);
+	if (!ExportData)
+	{
+		Error(TEXT("Could not create Export Particle Data interface"));
+		return false;
+	}
+	ExportData->CallbackHandlerParameter.Parameter = FNiagaraVariable(
+		FNiagaraTypeDefinition::GetUObjectDef(), TEXT("User.ExportHandler"));
+	// GPU writes past this per-frame reservation are dropped; gameplay reports when a frame fills it.
+	ExportData->GPUAllocationMode = ENDIExport_GPUAllocationMode::FixedSize;
+	ExportData->GPUAllocationFixedSize = 16384;
+	UNiagaraNodeFunctionCall* InsideHorizon = SetDynamicInput(Export, TEXT("Condition To Export Data"),
+		TEXT("/Niagara/DynamicInputs/Bool/v2/SetBoolByFloatComparison.SetBoolByFloatComparison"));
+	UNiagaraNodeFunctionCall* Distance = SetDynamicInput(InsideHorizon, TEXT("A"),
+		TEXT("/Niagara/DynamicInputs/Vectors/Position/DistanceBetweenPositions.DistanceBetweenPositions"));
+	const bool bExportLinked = InsideHorizon && Distance
+		&& SetStaticSwitch(InsideHorizon, TEXT("Comparison"), TEXT("Less"), TEXT("Equal"))
+		&& LinkInput(InsideHorizon, TEXT("B"), TEXT("User.HorizonRadius"))
+		&& LinkInput(Distance, TEXT("A"), TEXT("Particles.Position"))
+		&& LinkInput(Distance, TEXT("B"), TEXT("User.AttractorPosition"))
+		&& LinkInput(Export, TEXT("Float To Send"), TEXT("Particles.Age"))
+		&& SetLocalInput(Export, UpdateScript, EmitterName, TEXT("Delay Between Data Exports"), 0.0f);
+	UNiagaraNodeFunctionCall* Consume = AddModule(TEXT("/Niagara/Modules/Update/Lifetime/KillParticles.KillParticles"), ParticleUpdate, 3);
+	if (!bExportLinked || !LinkInput(Consume, TEXT("Kill Particles"),
+		TEXT("Output.ExportParticleDataToBlueprint.DataWasExportedThisFrame")))
+	{
+		Error(TEXT("Failed to build event-horizon export"));
+		return false;
+	}
+
+	UNiagaraNodeFunctionCall* Attractor = AddModule(TEXT("/Niagara/Modules/Update/Forces/V2/PointAttractionForce.PointAttractionForce"), ParticleUpdate, 4);
+	SetFloatInput(Attractor, UpdateScript, EmitterName, TEXT("Kill Radius"), 0.0f);
+	// The pull is a spring (force grows with distance), so its reach is capped by gameplay.
+	const bool bRadiusLinked = LinkInput(Attractor, TEXT("Attraction Radius"), TEXT("User.PullRadius"));
 	const bool bPositionLinked = BindInput(Attractor, TEXT("Attractor Position"), FNiagaraTypeDefinition::GetPositionDef(), TEXT("User.AttractorPosition"));
 	const bool bStrengthLinked = BindInput(Attractor, TEXT("Attraction Strength"), FNiagaraTypeDefinition::GetFloatDef(), TEXT("User.AttractionStrength"));
-	if (!bPositionLinked || !bStrengthLinked)
+	if (!bRadiusLinked || !bPositionLinked || !bStrengthLinked)
 	{
 		Error(TEXT("Failed to link attraction controls"));
 		return false;
 	}
-	UNiagaraNodeFunctionCall* Drag = AddModule(TEXT("/Niagara/Modules/Update/Forces/Drag.Drag"), ParticleUpdate, 3);
-	SetFloatInput(Drag, Data->UpdateScriptProps.Script, Emitter->GetUniqueEmitterName(), TEXT("Drag"), 0.7f);
-	// Week 1 uses two simple GPU rules: attraction and drag. Keeping idle embers
-	// in view makes the input response and render workload easier to inspect.
+
+	// Accretion swirl: the third simple rule, driven by gameplay only while the player pulls.
+	UNiagaraNodeFunctionCall* Vortex = AddModule(TEXT("/Niagara/Modules/Update/Forces/VortexForce.VortexForce"), ParticleUpdate, 5);
+	const bool bVortexLinked = LinkInput(Vortex, TEXT("Vortex Origin"), TEXT("User.AttractorPosition"))
+		&& LinkInput(Vortex, TEXT("Vortex Force Amount"), TEXT("User.VortexStrength"));
+	if (!bVortexLinked)
+	{
+		Error(TEXT("Failed to link vortex controls"));
+		return false;
+	}
+	SetFloatInput(Vortex, UpdateScript, EmitterName, TEXT("Influence Falloff Radius"), 1200.0f);
+
+	UNiagaraNodeFunctionCall* Drag = AddModule(TEXT("/Niagara/Modules/Update/Forces/Drag.Drag"), ParticleUpdate, 6);
+	SetFloatInput(Drag, UpdateScript, EmitterName, TEXT("Drag"), 0.7f);
+
+	// Cooling: colour fades from hot to cold over User.CoolSeconds, matching the heat
+	// value gameplay derives from the exported age.
+	UNiagaraNodeFunctionCall* Fade = ColorModule ? SetDynamicInput(ColorModule, TEXT("Color"),
+		TEXT("/Niagara/DynamicInputs/LinearColor/LerpLinearColors.LerpLinearColors")) : nullptr;
+	UNiagaraNodeFunctionCall* Clamp = Fade ? SetDynamicInput(Fade, TEXT("LerpFactor"),
+		TEXT("/Niagara/DynamicInputs/Clamp/ClampFloat.ClampFloat")) : nullptr;
+	UNiagaraNodeFunctionCall* AgeRatio = Clamp ? SetDynamicInput(Clamp, TEXT("Float"),
+		TEXT("/Niagara/DynamicInputs/Divide/Divide_Float.Divide_Float")) : nullptr;
+	const bool bFadeLinked = AgeRatio
+		&& LinkInput(Fade, TEXT("StartColor"), TEXT("User.HotColor"))
+		&& LinkInput(Fade, TEXT("EndColor"), TEXT("User.ColdColor"))
+		&& LinkInput(AgeRatio, TEXT("A"), TEXT("Particles.Age"))
+		&& LinkInput(AgeRatio, TEXT("B"), TEXT("User.CoolSeconds"));
+	if (!bFadeLinked)
+	{
+		Error(TEXT("Failed to build cooling colour"));
+		return false;
+	}
+
 	if (!bGPU)
 	{
-		AddModule(TEXT("/Niagara/Modules/Collision/Collision.Collision"), ParticleUpdate);
+		UNiagaraNodeFunctionCall* Collision = AddModule(TEXT("/Niagara/Modules/Collision/Collision.Collision"), ParticleUpdate);
+		// GPU collision uses the scene depth buffer; its default kills particles it cannot see,
+		// which would make the port simulate a different (shrinking) population.
+		UEdGraphPin* KillOffscreen = bPortToGPU && Collision ? Collision->FindPin(TEXT("Kill Offscreen Particles")) : nullptr;
+		// GPU depth-buffer collision killed the whole population in testing; the chamber floor
+		// is one plane, so the port collides analytically against it instead of tracing the scene.
+		if (bPortToGPU && !SetStaticSwitch(Collision, TEXT("GPU Collision Type"), TEXT("Analytical"), TEXT("")))
+		{
+			return false;
+		}
+		if (KillOffscreen)
+		{
+			KillOffscreen->DefaultValue = TEXT("false");
+			Collision->MarkNodeRequiresSynchronization(TEXT("EmberLab GPU collision"), true);
+			Note(TEXT("Collision.Kill Offscreen Particles = false"));
+		}
+		else if (bPortToGPU)
+		{
+			Error(TEXT("GPU port: Kill Offscreen Particles switch not found"));
+			return false;
+		}
 	}
 	Source->NodeGraph->NotifyGraphChanged();
 	FAssetRegistryModule::AssetCreated(System);
@@ -537,10 +819,15 @@ int32 UBuildEmberLabCommandlet::Main(const FString& Params)
 	}
 	const bool bGPU = BuildSystem(TEXT("NS_Embers_GPU"), true, 100000);
 	const bool bCPU = BuildSystem(TEXT("NS_Debris_CPU"), false, 500);
-	const bool bMap = bGPU && bCPU && BuildMap();
-	Note(FString::Printf(TEXT("RESULT: GPU=%s CPU=%s MAP=%s"),
-		bGPU ? TEXT("PASS") : TEXT("FAIL"), bCPU ? TEXT("PASS") : TEXT("FAIL"), bMap ? TEXT("PASS") : TEXT("FAIL")));
+	const bool bCPUDynamic = BuildSystem(TEXT("NS_Debris_CPU_DynamicBounds"), false, 500, true);
+	// Optimization comparison: the same debris emitter ported to GPU simulation.
+	const bool bDebrisGPU = BuildSystem(TEXT("NS_Debris_GPUPort"), false, 500, false, true);
+	const bool bMap = bGPU && bCPU && bCPUDynamic && bDebrisGPU && BuildMap();
+	Note(FString::Printf(TEXT("RESULT: GPU=%s CPU=%s CPUDynamic=%s DebrisGPUPort=%s MAP=%s"),
+		bGPU ? TEXT("PASS") : TEXT("FAIL"), bCPU ? TEXT("PASS") : TEXT("FAIL"),
+		bCPUDynamic ? TEXT("PASS") : TEXT("FAIL"), bDebrisGPU ? TEXT("PASS") : TEXT("FAIL"),
+		bMap ? TEXT("PASS") : TEXT("FAIL")));
 	const FString ReportPath = FPaths::ProjectSavedDir() / TEXT("AssetBuildReport.txt");
 	FFileHelper::SaveStringArrayToFile(Report, *ReportPath);
-	return bGPU && bCPU && bMap ? 0 : 1;
+	return bGPU && bCPU && bCPUDynamic && bDebrisGPU && bMap ? 0 : 1;
 }

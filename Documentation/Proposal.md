@@ -1,24 +1,24 @@
-# Ember Attractor
-**Niagara at Scale | One-page proposal | UE 5.7 | Individual project**
+# Ember Attractor: Black Hole
+**Niagara at Scale | One-page proposal | UE 5.7 | Individual project | Custom variation of Track B**
 
 ## Direction and scope
-An independent, one-room particle-control experiment inspired by the gravity-manipulation interaction in our Gravity project. The player guides explosion embers with a movable attraction field. This isolates a potential future interaction and VFX direction without importing assets, modifying Gravity, or claiming an existing integration. This is a proposed custom standalone variation; instructor approval is requested because the published Track B specifically describes boids.
+A one-room particle game built from the two gravity effects in our *Gravity* project: an explosion of hot embers and a black hole that swallows them. The player steers the black hole; the embers are the resource. Everything is rebuilt independently here. No Gravity assets or code are imported, and no existing integration is claimed. This replaces the Week 1 "guide embers into a recovery zone" idea, because the black hole gives a tighter two-way loop. The Week 1 particle systems, controls and capture tools carry over unchanged.
 
 ## Mechanic
-A repeatable burst releases hot particles into a test chamber. Moving the mouse positions an attraction field; holding the mouse button draws particles toward it. The intended completed mechanic is to guide hot material into a recovery region before it cools. Recovery must depend on simulated particle state, rather than a separate invisible overlap proxy. Week 1 establishes both simulations, input control, count control, and the first performance capture; end-to-end scoring and GPU-to-gameplay feedback are Week 2 work.
+An explosion scatters hot embers and debris across a chamber. The mouse moves a black hole: anything inside its event horizon is swallowed for free. Holding the mouse button pulls matter in from a wider radius and spins it into an accretion swirl, but this drains a limited **energy** tank that only recharges while the player lets go. Embers **cool** over time and lose value. The goal is to reach critical mass before the timer ends, which means trading energy now against matter that is going cold. Swallowed mass grows the horizon and strengthens the pull, so the black hole visibly feeds on the simulation.
 
 ## Two ends of the cost curve
-**Simple and many:** 100,000+ GPU sprite embers using attraction and drag. **Complex and few:** 500-5,000 CPU mesh fragments with movement and collision response, adding per-particle thermal state and recovery events in Week 2. Both use the same attraction interaction and independent runtime particle-count controls. Additional complex behavior and particle-to-gameplay events will be completed and evaluated in Week 2.
+**Simple and many:** 100,000+ GPU sprite embers with three rules: spring pull to the hole, vortex swirl and drag. **Complex and few:** 500–5,000 CPU mesh debris with the same forces plus scene collision and age-driven heat state. Both systems feed the same gameplay readback. Runtime count control: `ember.GPUCount`, `ember.CPUCount` and preset keys.
 
 ## Gameplay data path
-C++ supplies count, attraction position, enable state, and strength through Niagara user parameters. CPU simulation output will be exported to C++ for recovery events. For GPU feedback, prototype a compact occupancy/heat accumulation grid with asynchronous readback; measure latency and overhead, and document any approximation. Neither exposed parameters nor a visual attraction effect alone proves two-way coupling.
+**Gameplay → Niagara:** user parameters for hole position, pull strength, pull radius, vortex, horizon radius and cooling time. **Niagara → gameplay:** an *Export Particle Data* interface writes a particle only in the frame it crosses the horizon, sending its age. A *Kill Particles* module consumes the same flag, so each particle is reported exactly once (asynchronous readback on the GPU, synchronous on the CPU). C++ turns age into heat and heat into mass, which feeds back into the horizon and the pull. That makes the coupling two-way and makes the outcome depend on particle state.
 
 ## Budget and measurement
-Target 1080p at 60 fps (16.6 ms/frame) on lab hardware, with combined Niagara game/render-thread cost at or below 4 ms; record GPU cost separately. Compare baseline, GPU-only, CPU-only, and combined modes at a fixed camera. Sweep GPU counts 10k/25k/50k/100k/200k and CPU counts 500/1k/2k/3.5k/5k, extending until the budget fails. Preserve Unreal Insights traces, CSV captures, and stat/debugger evidence. Week 3 will measure a controlled optimization, such as an Effect Type scalability policy, against the same workload.
+Budget stated before building: 1080p at 60 fps (16.6 ms per frame), with combined Niagara game- and render-thread cost at or below 4 ms; GPU time is recorded separately. Sweep each system across at least five counts until the budget fails (GPU 100k→8M, CPU 500→20k), with `stat Niagara`, `stat GPU`, the Niagara Debugger, engine CSVs and Unreal Insights. The optimization will be measured before and after on identical workloads: fixed vs dynamic bounds, and a CPU-to-GPU port of the debris.
 
 ## References and milestones
-**Primary mechanical reference: PixelJunk Shooter Ultimate**, where controlling simulated material drives puzzles. **Secondary: Noita**, for hot-material readability and material-state consequences. Official design sources are linked below; personal play/watch notes must be added after reviewing at least two games, as the assignment requests.
+**Primary reference: PixelJunk Shooter**, where simulated material is the puzzle and the player manipulates it indirectly. **Secondary: Noita**, for hot material whose state changes what it is worth. Personal play/watch notes will be added after reviewing both games.
 
-**Week 1:** both systems in a test map, runtime count controls, first capture. **Week 2:** playable recovery loop, verified two-way feedback, complete scaling sweep. **Week 3:** measured optimization, two-page report, 60-90 second video, tagged repository release.
+**Week 1:** both systems in a test map, runtime count control, first capture (done). **Week 2:** black-hole round with energy and cooling, verified two-way readback, full scaling sweep. **Week 3:** measured optimization, two-page report, 60–90 second video, tagged release.
 
 Sources: [Noita official site](https://noitagame.com/) · [PixelJunk Shooter Ultimate developer article](https://blog.playstation.com/2014/03/05/pixeljunk-shooter-ultimate-coming-to-ps4-ps-vita-this-summer/)
