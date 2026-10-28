@@ -75,7 +75,7 @@ html = f"""<!doctype html>
 body {{ font-family: 'Segoe UI', Arial, sans-serif; font-size: 8.6pt; line-height: 1.32; color: #1d2735; margin: 0; }}
 h1 {{ font-size: 17pt; margin: 0 0 2pt; color: #17283e; }}
 .sub {{ color: #5b6472; margin-bottom: 8pt; }}
-h2 {{ font-size: 10pt; color: #ad4b18; margin: 7pt 0 2pt; border-bottom: 1px solid #e6e8ec; padding-bottom: 1pt; }}
+h2 {{ break-after: avoid; font-size: 10pt; color: #ad4b18; margin: 7pt 0 2pt; border-bottom: 1px solid #e6e8ec; padding-bottom: 1pt; }}
 p {{ margin: 0 0 4pt; }}
 table {{ border-collapse: collapse; width: 100%; margin: 2pt 0 4pt; font-size: 7.9pt; }}
 th, td {{ border-bottom: 1px solid #e6e8ec; padding: 1.2pt 4pt; text-align: right; }}
@@ -95,7 +95,6 @@ svg {{ width: 100%; height: auto; }}
 <div class="two"><div><b>System 1 — GPU sprites (mode 1)</b>{sweep_table(gpu, 'gpu_count')}</div>
 <div><b>System 2 — CPU meshes (mode 2)</b>{sweep_table(cpu, 'cpu_count')}</div></div>
 <p class="note">All values in ms. Baseline with no particles: wall mean {fmt(baseline['wall_mean_ms']) if baseline else '—'}, GPU frame {fmt(baseline['gpu_frame_ms']) if baseline else '—'}. Red rows miss the budget (wall P95 &gt; 16.6 ms or Niagara GT+RT &gt; 4 ms).</p>
-<div class="page2"></div>
 <h2>Where each system breaks</h2>{paragraphs('breaking')}
 <h2>Optimization: fixed bounds on the CPU system</h2>{paragraphs('optimization_intro')}{bounds_table()}<p>{narrative['optimization_result'][0]}</p><p>{narrative['optimization_result'][1]}</p>{port_table()}
 <h2>Many simple vs few complex</h2>{paragraphs('tradeoff')}

@@ -14,7 +14,7 @@ Additional checks: mode 0 removed all particles; modes 1/2 independently disable
 
 ## Initial measurements
 
-Hardware: Intel Core Ultra 7 265F, NVIDIA GeForce RTX 5070 Ti, approximately 32 GB RAM, Windows 11. Editor Development game, D3D12, 1920×1080, VSync off, fixed camera. Runs were sequential, with real offscreen rendering, a 10-second warmup and a 20-second measured window. Tracing, named events, CSV collection and stat overlays were enabled. These are instrumented workstation measurements, not certification on course lab hardware.
+Hardware: Intel Core Ultra 7 265F, NVIDIA GeForce RTX 5070 Ti, approximately 32 GB RAM, Windows 11. Editor Development game, D3D12, 1920×1080, VSync off, fixed camera. Runs were sequential, with real offscreen rendering, a 10-second warmup and a 20-second measured window. Tracing, named events, CSV collection and stat overlays were enabled. These are instrumented measurements on a high-end workstation.
 
 | Mode | Samples | Wall mean (ms) | Wall P95 (ms) | Whole GPU mean (ms) | System GT + RT aggregate (ms) | Niagara GPU simulation (ms) |
 |---|---:|---:|---:|---:|---:|---:|

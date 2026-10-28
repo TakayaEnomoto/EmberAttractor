@@ -113,7 +113,7 @@ Budget, stated before building: **60 fps (16.6 ms) at 1080p, with Niagara at mos
 - `Tools/RecordDemo.ps1 -Monitor 1 -FFmpeg <ffmpeg.exe>` records the scripted showcase used for `Video/EmberAttractor_demo.mp4` (`-EmberDemo`: a winning round, a round where the matter goes cold, then `stat fps`/`stat unit`/Niagara Debugger while scaling to 4M GPU embers and comparing CPU debris with the GPU port). It centres the 1920×1080 client area on the chosen monitor and captures only that rectangle to `../Video/`.
 - Unreal Insights traces (default game, GPU 8M, CPU 10k; 30–340 MB each) are too large for Git and stay in the ignored `Saved/Profiling` folder; regenerate them with `Tools/Capture.ps1` (without `-NoTrace`).
 
-### Results at a glance (workstation above lab spec; see the report for method)
+### Results at a glance (RTX 5070 Ti workstation; see the report for method)
 
 | | Passes budget up to | Fails at | Limiting factor |
 |---|---|---|---|
